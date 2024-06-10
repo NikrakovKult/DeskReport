@@ -1,0 +1,135 @@
+body {
+    background: url("https://img.goodfon.ru/wallpaper/nbig/f/b7/abstraktsiia-smes-tsvetov-perelivy-abstraction-a-mixture-of.webp");
+    background-size: cover;
+    background-position: center;
+    height: 100vh;
+    margin: 0;
+  }
+  
+  .Order {
+    background-color: none; 
+    padding: 20px;
+    border: 1px solid #fff;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(15px);
+    
+  margin: 0 auto;
+    color: white;
+    font-family: sans-serif;
+    
+  }
+  form {
+    width: 40%;
+    margin: 0 auto;
+    order: 2;
+  }
+  .form-group {
+    margin-bottom: 20px;
+  }
+  
+  label {
+    display: block;
+    margin-bottom: 10px;
+    margin-left: 10px;
+  }
+  
+  input[type="text"], select {
+    color: white;
+    font-family: sans-serif;
+    width: 95%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background: none;
+    background-color: #89898975;
+    margin: 0 auto;
+    display: block;
+  }
+  
+  input[type="submit"] {
+    background-color: #00d0ff8a;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin: 0 auto;
+    display: block;
+  }
+  
+  input[type="submit"]:hover {
+    background-color: #00d0ffd5;
+    margin: 0 auto;
+    display: block;
+  }
+  #Discrip{
+    height: 150px;
+  }
+  .photos{
+    display: flex;
+    justify-content: center;
+  }
+  .photos img{
+    border-radius: 15px;
+    width: 250px;
+    height: 250px;
+    margin: 10px;
+    
+  }
+  .sender-info h2{
+    text-align: center;
+  }
+  .specialist-info h2{
+    text-align: center;
+  }
+  .sender-info p{
+    text-align: center;
+    padding: 5px;
+    border-radius: 15px;
+    background-color: #00000080;
+  }
+  .specialist-info p{
+    text-align: center;
+    padding: 5px;
+    border-radius: 15px;
+    background-color: #00000080;
+  }
+  .sender-info {
+    height: 300px;
+    border-radius: 15px;
+    color: white;
+    background: none;
+    backdrop-filter: blur(15px);
+    width: 25%;
+    padding: 20px;
+    border: 1px solid #ccc;
+    /* background-color: #f9f9f9; */
+    margin: 20px;
+    order: 1;
+    font-family: sans-serif;
+  }
+  .specialist-info {
+    height: 300px;
+    border-radius: 15px;
+    color: white;
+    background: none;
+    backdrop-filter: blur(15px);
+    width: 25%;
+    padding: 20px;
+    border: 1px solid #ccc;
+    background-color: #86868633;
+    margin: 20px;
+    order: 3;
+    font-family: sans-serif;
+  }
+  
+  .info-container {
+    margin-top: 100px;
+    display: flex;
+    justify-content: space-between;
+  }
+  
+  .sender-info {
+    margin-right: 20px;
+  }
