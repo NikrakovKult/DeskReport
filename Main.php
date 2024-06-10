@@ -84,6 +84,7 @@ if (isset($_SESSION["id"])) {
                 клиенты</a>
             <a href="#" class="nav-item" active-color="blue"><i class='fa fa-sticky-note'></i>Заметки</a>
             <a href="#" class="nav-item" active-color="blue"><i class='fa fa-tasks'></i>Задачи</a>
+            <a href="#" class="nav-item" active-color="blue"><i class='fa fa-tasks'></i>Анализ</a>
             <span class="nav-indicator"></span>
         </nav>
     </div>
