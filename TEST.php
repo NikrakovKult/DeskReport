@@ -1,93 +1,138 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <title>Document</title>
 </head>
 <body>
-<style>
-    tr {
-        display: block;
-        margin: 10px;
-        border-radius: 15px;
-        background-color: #fff;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        padding: 10px;
-    }
-
-    tr:hover {
-        background-color: #f5f5f5;
-    }
-
-    td {
-        display: inline-block;
-        width: 16%;
-        margin-right: 2%;
-        border: none;
-        background-color: transparent;
-        padding: 0;
-    }
-
-    tbody a{
-        color: #0066cc;
-        text-decoration: none;
-        border: none;
-        background-color: transparent;
-        padding: 0;
-    }
-</style>
 <?php
-// Подключение к базе данных
 $conn = mysqli_connect("localhost", "root", "", "DeskReport");
+$sql = "SELECT * FROM orders";
+$stmt = $conn->prepare($sql);
+$stmt->execute();
+$result = $stmt->get_result();
 
-// Проверка подключения
-if (!$conn) {
-    die("Ошибка подключения: ". mysqli_connect_error());
-}
 
-// Выборка данных из таблицы actives
-$sql = "SELECT * FROM actives";
-$result = mysqli_query($conn, $sql);
+$labels = array();
+$data = array();
+$statuses = array();
+$orders = array();
 
-// Проверка результата запроса
-if (!$result) {
-    die("Ошибка запроса: ". mysqli_error($conn));
-}
-
-// Вывод таблицы на страницу
-echo "<table border='1' cellpadding='5' cellspacing='0'>";
-echo "<tr>";
-echo "<th>ID</th>";
-echo "<th>Название</th>";
-echo "<th>Тип</th>";
-echo "<th>Модель</th>";
-echo "<th>Серийный номер</th>";
-echo "<th>Дата покупки</th>";
-echo "<th>Местоположение</th>";
-echo "<th>Статус</th>";
-echo "<th>Примечания</th>";
-echo "</tr>";
 
 while ($row = mysqli_fetch_assoc($result)) {
-    echo "<tr>";
-    echo "<td>". $row['id']. "</td>";
-    echo "<td>". $row['name']. "</td>";
-    echo "<td>". $row['type']. "</td>";
-    echo "<td>". $row['model']. "</td>";
-    echo "<td>". $row['serial_number']. "</td>";
-    echo "<td>". $row['purchase_date']. "</td>";
-    echo "<td>". $row['location']. "</td>";
-    echo "<td>". $row['status']. "</td>";
-    echo "<td>". $row['notes']. "</td>";
-    echo "</tr>";
+    $labels[] = $row['Date_by'];
+    $data[] = $row['id'];
+    $statuses[] = $row['Status'];
+    $orders[] = $row['Discrip'];
 }
 
-echo "</table>";
 
-// Закрытие подключения
-mysqli_close($conn);
+$labelsJson = json_encode($labels);
+$dataJson = json_encode($data);
+$statusesJson = json_encode($statuses);
+$ordersJson = json_encode($orders);
 ?>
+<div>
+    <canvas id="orders-chart"></canvas>
+</div>
+
+<script>
+    
+    var ctx = document.getElementById('orders-chart').getContext('2d');
+    var chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: <?php echo $labelsJson;?>,
+            datasets: [{
+                label: 'Количество заявок',
+                data: <?php echo $dataJson;?>,
+                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                borderColor: 'rgba(255, 99, 132, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            title: {
+                display: true,
+                text: 'Статистика заявок'
+            },
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+    
+    var statusFilter = document.getElementById('status');
+    var orderFilter = document.getElementById('order');
+
+    statusFilter.addEventListener('change', function() {
+        var status = this.value;
+        var filteredData = <?php echo $dataJson;?>;
+        var filteredLabels = <?php echo $labelsJson;?>;
+
+        
+        filteredData = filteredData.filter(function(item, index) {
+            return <?php echo $statusesJson;?>[index] === status;
+        });
+        filteredLabels = filteredLabels.filter(function(item, index) {
+            return <?php echo $statusesJson;?>[index] === status;
+        });
+
+        // Обновляем график
+        chart.data.labels = filteredLabels;
+        chart.data.datasets[0].data = filteredData;
+        chart.update();
+    });
+
+    orderFilter.addEventListener('change', function() {
+        var order = this.value;
+        var filteredData = <?php echo $dataJson;?>;
+        var filteredLabels = <?php echo $labelsJson;?>;
+
+        // Фильтруем данные по заявке
+        filteredData = filteredData.filter(function(item, index) {
+            return <?php echo $ordersJson;?>[index] === order;
+        });
+        filteredLabels = filteredLabels.filter(function(item, index) {
+            return <?php echo $ordersJson;?>[index] === order;
+        });
+
+        // Обновляем график
+        chart.data.labels = filteredLabels;
+        chart.data.datasets[0].data = filteredData;
+        chart.update();
+    });
+</script>
+
+<!-- Форма для фильтров -->
+<form>
+    <label>Статус:</label>
+    <select id="status">
+        <option value="">Все статусы</option>
+        <?php
+        $statuses = array_unique($statuses);
+        foreach ($statuses as $status) {
+            echo "<option value='$status'>$status</option>";
+        }
+        ?>
+    </select>
+
+    <label>Заявка:</label>
+    <select id="order">
+        <option value="">Все заявки</option>
+        <?php
+        $orders = array_unique($orders);
+        foreach ($orders as $order) {
+            echo "<option value='$order'>$order</option>";
+        }
+        ?>
+    </select>
+</form>
 </body>
-</html> 
+</html>
