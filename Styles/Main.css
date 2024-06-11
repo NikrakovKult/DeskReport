@@ -235,3 +235,38 @@ th {
   background-color: #000000;
   z-index: 1;
 }
+.info{
+  grid-area: 1 / 1 / 1 / 2;
+    border-radius: 15px;
+    height: 150px;
+    padding: 15px;
+    margin-right: 40px;
+    background-color: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(15px);
+
+}
+.graph{
+  display: none; 
+  flex-wrap: wrap; 
+  justify-content: space-between;
+}
+#new-chart{
+ 
+  background: rgba(0, 0, 0, 0.52);
+  border-radius: 15px;
+}
+#in-work-chart{
+ 
+  background: rgba(0, 0, 0, 0.52);
+  border-radius: 15px;
+}
+#paused-chart{
+
+  background: rgba(0, 0, 0, 0.52);
+  border-radius: 15px;
+}
+#completed-chart{
+  
+  background: rgba(0, 0, 0, 0.52);
+  border-radius: 15px;
+}

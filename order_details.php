@@ -120,7 +120,7 @@ require_once('connect.php');
                         $specialist_info .= "<p>Отдел: " . $specialist_data['Otdel'] . "</p>";
                         $specialist_info .= "<p>Мобильный телефон: " . $specialist_data['Mobile'] . "</p>";
                     } else {
-                        $specialist_info = "No specialist data found.";
+                        $specialist_info = "<p>Спецаилист не назначен.</p>";
                     }
 
                     echo "<input type='submit' value='Сохранить'>";

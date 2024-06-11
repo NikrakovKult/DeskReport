@@ -68,11 +68,15 @@ if (isset($_SESSION["id"])) {
     <link rel="stylesheet" href="/Styles/Main.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="MainFunc.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css"
         integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
 </head>
 
 <body>
+    <div class="info">
+
+    </div>
     <div class="nav-sidebar">
         <nav class="nav">
             <a href="#" class="nav-item" active-color="blue" onclick="showOrdersTable()">Заявки</a>
@@ -84,7 +88,7 @@ if (isset($_SESSION["id"])) {
                 клиенты</a>
             <a href="#" class="nav-item" active-color="blue"><i class='fa fa-sticky-note'></i>Заметки</a>
             <a href="#" class="nav-item" active-color="blue"><i class='fa fa-tasks'></i>Задачи</a>
-            <a href="#" class="nav-item" active-color="blue"><i class='fa fa-tasks'></i>Анализ</a>
+            <a href="#" class="nav-item" active-color="blue" onclick="showGraph()"><i class='fa fa-tasks'></i>Анализ</a>
             <span class="nav-indicator"></span>
         </nav>
     </div>
@@ -97,7 +101,10 @@ if (isset($_SESSION["id"])) {
             <option value="Приостановлено">Приостановлено</option>
             <option value="Завершено">Завершено</option>
         </select>
-
+        <select name="specialist" id="specialist" onchange="updateTable(this.value)">
+        <option value="">Все специалисты</option>
+        <option value="<?php echo $user_data['username'];?>">Мои заявки</option>
+    </select>
     </div>
     <div class="user-info">
         <p> <?php echo $user_data['username']; ?></p>
@@ -209,6 +216,233 @@ if (isset($_SESSION["id"])) {
             echo "</table>";
         }
         ?>
+
+        <div class="graph">
+            <div style="width: 20%; color:white; margin:10px;">
+                <h2>Новые заявки</h2>
+                <canvas id="new-chart"></canvas>
+            </div>
+            <div style="width: 20%; color:white; margin:10px;">
+                <h2>Заявки в работе</h2>
+                <canvas id="in-work-chart"></canvas>
+            </div>
+            <div style="width: 20%; color:white; margin:10px;">
+                <h2>Приостановленные заявки</h2>
+                <canvas id="paused-chart"></canvas>
+            </div>
+            <div style="width: 20%; color:white; margin:10px;">
+                <h2>Завершенные заявки</h2>
+                <canvas id="completed-chart"></canvas>
+            </div>
+            <div style="width: 20%; color:white; margin:10px;">
+                <h2>Мои заявки</h2>
+                <canvas id="my-orders-chart"></canvas>
+            </div>
+            <?PHP
+            $monday = date('Y-m-d', strtotime('monday this week'));
+            $sunday = date('Y-m-d', strtotime('sunday this week'));
+
+            $query = "SELECT Date_by, COUNT(*) as count FROM orders WHERE Status = 'Новая' AND Date_by BETWEEN '$monday' AND '$sunday' GROUP BY Date_by";
+            $result = mysqli_query($conn, $query);
+            $newData = [];
+            while ($row = mysqli_fetch_assoc($result)) {
+                $newData[] = [
+                    'date' => $row['Date_by'],
+                    'count' => $row['count']
+                ];
+            }
+
+            $query = "SELECT Date_by, COUNT(*) as count FROM orders WHERE Status = 'В работе' AND Date_by BETWEEN '$monday' AND '$sunday' GROUP BY Date_by";
+            $result = mysqli_query($conn, $query);
+            $inWorkData = [];
+            while ($row = mysqli_fetch_assoc($result)) {
+                $inWorkData[] = [
+                    'date' => $row['Date_by'],
+                    'count' => $row['count']
+                ];
+            }
+
+            $query = "SELECT Date_by, COUNT(*) as count FROM orders WHERE Status = 'Приостановлено' AND Date_by BETWEEN '$monday' AND '$sunday' GROUP BY Date_by";
+            $result = mysqli_query($conn, $query);
+            $pausedData = [];
+            while ($row = mysqli_fetch_assoc($result)) {
+                $pausedData[] = [
+                    'date' => $row['Date_by'],
+                    'count' => $row['count']
+                ];
+            }
+
+            $query = "SELECT Date_by, COUNT(*) as count FROM orders WHERE Status = 'Завершено' AND Date_by BETWEEN '$monday' AND '$sunday' GROUP BY Date_by";
+            $result = mysqli_query($conn, $query);
+            $completedData = [];
+            while ($row = mysqli_fetch_assoc($result)) {
+                $completedData[] = [
+                    'date' => $row['Date_by'],
+                    'count' => $row['count']
+                ];
+            }
+            $username = $user_data['username'];
+            $query = "SELECT Date_by, COUNT(*) as count FROM orders WHERE Sender =? AND Date_by BETWEEN '$monday' AND '$sunday' GROUP BY Date_by";
+            $stmt = $conn->prepare($query);
+            $stmt->bind_param("s", $username);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            $myOrdersData = [];
+            while ($row = mysqli_fetch_assoc($result)) {
+                $myOrdersData[] = [
+                    'date' => $row['Date_by'],
+                    'count' => $row['count']
+                ];
+            }
+            ?>
+
+            <script>
+                const ctxNew = document.getElementById('new-chart').getContext('2d');
+                const chartNew = new Chart(ctxNew, {
+                    type: 'line',
+                    data: {
+                        labels: <?= json_encode(array_column($newData, 'date')) ?>,
+                        datasets: [{
+                            label: 'Количество заявок',
+                            data: <?= json_encode(array_column($newData, 'count')) ?>,
+                            backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                            borderColor: 'rgba(255, 255, 255, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                stepSize: 1
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        }
+                    }
+                });
+
+                const ctxInWork = document.getElementById('in-work-chart').getContext('2d');
+                const chartInWork = new Chart(ctxInWork, {
+                    type: 'line',
+                    data: {
+                        labels: <?= json_encode(array_column($inWorkData, 'date')) ?>,
+                        datasets: [{
+                            label: 'Количество заявок',
+                            data: <?= json_encode(array_column($inWorkData, 'count')) ?>,
+                            backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                            borderColor: 'rgba(255, 255, 255, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                stepSize: 1
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        }
+                    }
+                });
+                const ctxPaused = document.getElementById('paused-chart').getContext('2d');
+                const chartPaused = new Chart(ctxPaused, {
+                    type: 'line',
+                    data: {
+                        labels: <?= json_encode(array_column($pausedData, 'date')) ?>,
+                        datasets: [{
+                            label: 'Количество заявок',
+                            data: <?= json_encode(array_column($pausedData, 'count')) ?>,
+                            backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                            borderColor: 'rgba(255, 255, 255, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                stepSize: 1
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        }
+                    }
+                });
+
+                const ctxCompleted = document.getElementById('completed-chart').getContext('2d');
+                const chartCompleted = new Chart(ctxCompleted, {
+                    type: 'line',
+                    data: {
+                        labels: <?= json_encode(array_column($completedData, 'date')) ?>,
+                        datasets: [{
+                            label: 'Количество заявок',
+                            data: <?= json_encode(array_column($completedData, 'count')) ?>,
+                            backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                            borderColor: 'rgba(255, 255, 255, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                stepSize: 1
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+
+                            }
+                        }
+                    }
+                });
+                const ctxMyOrders = document.getElementById('my-orders-chart').getContext('2d');
+                const chartMyOrders = new Chart(ctxMyOrders, {
+                    type: 'line',
+                    data: {
+                        labels: <?= json_encode(array_column($myOrdersData, 'date')) ?>,
+                        datasets: [{
+                            label: 'Количество заявок',
+                            data: <?= json_encode(array_column($myOrdersData, 'count')) ?>,
+                            backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                            borderColor: 'rgba(255, 255, 255, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                stepSize: 1
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        }
+                    }
+                });
+            </script>
+        </div>
+
+
+    </div>
+
+
+
     </div>
 
 

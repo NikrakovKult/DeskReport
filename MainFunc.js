@@ -14,7 +14,11 @@ $(document).ready(function() {
   
     // Вызов функции loadOrders при загрузке страницы
     loadOrders('');
-  
+    $('#specialist').on('change', function() {
+        var specialist = $(this).val();
+        var status = $('#status').val();
+        loadOrders(status, specialist);
+      });
     // Вызов функции loadOrders при клике на навигационном меню
     $(".nav-item").on("click", function() {
       loadOrders('');
@@ -64,11 +68,20 @@ $(document).ready(function() {
         });
     });
 });
+
 function showActivesTable() {
     document.getElementById("orders-table").style.display = "none";
     document.getElementById("actives-table").style.display = "table";
+    document.getElementsByClassName("graph")[0].style.display = "none";
 }
 function showOrdersTable() {
     document.getElementById("orders-table").style.display = "table";
     document.getElementById("actives-table").style.display = "none";
+    document.getElementsByClassName("graph")[0].style.display = "none";
 }
+function showGraph() {
+    document.getElementById("orders-table").style.display = "none";
+    document.getElementById("actives-table").style.display = "none";
+    document.getElementsByClassName("graph")[0].style.display = "flex";
+}
+
