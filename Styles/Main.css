@@ -152,6 +152,7 @@ tr:hover {
 
 
 td {
+  
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -167,6 +168,8 @@ td {
 
 td:last-child {
   border-right: none;
+  color: #ffffff;
+  border-radius: 15px;
 }
 
 tbody a {
@@ -312,4 +315,19 @@ th {
   
   background: rgba(0, 0, 0, 0.52);
   border-radius: 15px;
+}
+.new-status {
+  background-color: #919191; /* желтый */
+}
+
+.in-work-status {
+  background-color: #39e7bc; /* зеленый */
+}
+
+.paused-status {
+  background-color: #ff9900; /* оранжевый */
+}
+
+.completed-status {
+  background-color: #00ff0d; /* синий */
 }

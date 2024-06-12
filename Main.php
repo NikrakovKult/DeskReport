@@ -166,7 +166,9 @@ if (isset($_SESSION["id"])) {
     </div>
 
     <div class="main-table">
-
+<script>
+    
+</script>
         <?php
 
         if (isset($_SESSION['id'])) {
@@ -220,7 +222,7 @@ if (isset($_SESSION["id"])) {
                 echo "<td><a href='order_details.php?id=" . $row['id'] . "'>" . $row['Sender'] . "</a></td>";
                 echo "<td><a href='order_details.php?id=" . $row['id'] . "'>" . $row['Specialist'] . "</a></td>";
                 echo "<td><a href='order_details.php?id=" . $row['id'] . "'>" . $row['Date_by'] . "</a></td>";
-                echo "<td><a href='order_details.php?id=" . $row['id'] . "'>" . $row['Status'] . "</a></td>";
+                echo "<td class='" . getStatusClass($row['Status']) . "'>" . $row['Status'] . "</td>"; 
 
                 echo "</tr>";
 
@@ -228,7 +230,22 @@ if (isset($_SESSION["id"])) {
 
             echo "</table>";
         }
+        function getStatusClass($status) {
+            switch ($status) {
+                case 'Новая':
+                    return 'new-status';
+                case 'В работе':
+                    return 'in-work-status';
+                case 'Приостановлено':
+                    return 'paused-status';
+                case 'Завершено':
+                    return 'completed-status';
+                default:
+                    return '';
+            }
+        }
         ?>
+        
         <?php
         if (isset($_SESSION['id'])) {
             $sql = "SELECT * FROM actives";
