@@ -8,45 +8,53 @@ if (!$conn) {
 $monday = date('Y-m-d', strtotime('monday this week'));
 $sunday = date('Y-m-d', strtotime('sunday this week'));
 
+$daysOfWeek = ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'];
+$newData = array_fill(0, 7, 0);
+$inWorkData = array_fill(0, 7, 0);
+$pausedData = array_fill(0, 7, 0);
+$completedData = array_fill(0, 7, 0);
+$redenkovData = array_fill(0, 7, 0);
+
 $query = "SELECT Date_by, COUNT(*) as count FROM orders WHERE Status = 'Новая' AND Date_by BETWEEN '$monday' AND '$sunday' GROUP BY Date_by";
 $result = mysqli_query($conn, $query);
-$newData = [];
 while ($row = mysqli_fetch_assoc($result)) {
-  $newData[] = [
-    'date' => $row['Date_by'],
-    'count' => $row['count']
-  ];
+  $date = $row['Date_by'];
+  $dayOfWeek = date('w', strtotime($date)); // 0 = Sunday, 1 = Monday,..., 6 = Saturday
+  $newData[$dayOfWeek] += $row['count']; // суммируем количество заявок для каждого дня недели
 }
 
 $query = "SELECT Date_by, COUNT(*) as count FROM orders WHERE Status = 'В работе' AND Date_by BETWEEN '$monday' AND '$sunday' GROUP BY Date_by";
 $result = mysqli_query($conn, $query);
-$inWorkData = [];
 while ($row = mysqli_fetch_assoc($result)) {
-  $inWorkData[] = [
-    'date' => $row['Date_by'],
-    'count' => $row['count']
-  ];
+  $date = $row['Date_by'];
+  $dayOfWeek = date('w', strtotime($date)); // 0 = Sunday, 1 = Monday,..., 6 = Saturday
+  $inWorkData[$dayOfWeek] += $row['count']; // суммируем количество заявок для каждого дня недели
 }
 
 $query = "SELECT Date_by, COUNT(*) as count FROM orders WHERE Status = 'Приостановлено' AND Date_by BETWEEN '$monday' AND '$sunday' GROUP BY Date_by";
 $result = mysqli_query($conn, $query);
-$pausedData = [];
 while ($row = mysqli_fetch_assoc($result)) {
-  $pausedData[] = [
-    'date' => $row['Date_by'],
-    'count' => $row['count']
-  ];
+  $date = $row['Date_by'];
+  $dayOfWeek = date('w', strtotime($date)); // 0 = Sunday, 1 = Monday,..., 6 = Saturday
+  $pausedData[$dayOfWeek] += $row['count']; // суммируем количество заявок для каждого дня недели
 }
 
 $query = "SELECT Date_by, COUNT(*) as count FROM orders WHERE Status = 'Завершено' AND Date_by BETWEEN '$monday' AND '$sunday' GROUP BY Date_by";
 $result = mysqli_query($conn, $query);
-$completedData = [];
 while ($row = mysqli_fetch_assoc($result)) {
-  $completedData[] = [
-    'date' => $row['Date_by'],
-    'count' => $row['count']
-  ];
+  $date = $row['Date_by'];
+  $dayOfWeek = date('w', strtotime($date)); // 0 = Sunday, 1 = Monday,..., 6 = Saturday
+  $completedData[$dayOfWeek] += $row['count']; // суммируем количество заявок для каждого дня недели
 }
+
+$query = "SELECT Date_by, COUNT(*) as count FROM orders WHERE Specialist = 'Реденков Никита Олегович' AND Date_by BETWEEN '$monday' AND '$sunday' GROUP BY Date_by";
+$result = mysqli_query($conn, $query);
+while ($row = mysqli_fetch_assoc($result)) {
+  $date = $row['Date_by'];
+  $dayOfWeek = date('w', strtotime($date)); // 0 = Sunday, 1 = Monday,..., 6 = Saturday
+  $redenkovData[$dayOfWeek] += $row['count']; // суммируем количество заявок для каждого дня недели
+}
+
 ?>
 
 
@@ -74,34 +82,38 @@ while ($row = mysqli_fetch_assoc($result)) {
         <h2>Завершенные заявки</h2>
         <canvas id="completed-chart"></canvas>
       </div>
+      <div style="width: 45%;">
+        <h2>Заявки со специалистом Реденков Никита Олегович</h2>
+        <canvas id="redenkov-chart"></canvas>
+      </div>
     </div>
     <script>
       const ctxNew = document.getElementById('new-chart').getContext('2d');
-      const chartNew = new Chart(ctxNew, {
-        type: 'line',
-        data: {
-          labels: <?= json_encode(array_column($newData, 'date'))?>,
-          datasets: [{
-            label: 'Количество заявок',
-            data: <?= json_encode(array_column($newData, 'count'))?>,
-            backgroundColor: 'rgba(255, 255, 255, 0.2)',
-            borderColor: 'rgba(255, 255, 255, 1)',
-            borderWidth: 1
-          }]
-        },
-        options: {
-          scales: {
-            y: {
-              beginAtZero: true
-            }
-          },
-          plugins: {
-            legend: {
-              display: false
-            }
-          }
-        }
-      });
+const chartNew = new Chart(ctxNew, {
+  type: 'line',
+  data: {
+    labels: <?= json_encode($daysOfWeek)?>,
+    datasets: [{
+      label: 'Количество заявок',
+      data: <?= json_encode($newData)?>,
+      backgroundColor: 'rgba(255, 255, 255, 0.2)',
+      borderColor: 'rgba(255, 255, 255, 1)',
+      borderWidth: 1
+    }]
+  },
+  options: {
+    scales: {
+      y: {
+        beginAtZero: true
+      }
+    },
+    plugins: {
+      legend: {
+        display: false
+      }
+    }
+  }
+});
 
       const ctxInWork = document.getElementById('in-work-chart').getContext('2d');
       const chartInWork = new Chart(ctxInWork, {
@@ -164,6 +176,33 @@ while ($row = mysqli_fetch_assoc($result)) {
           datasets: [{
             label: 'Количество заявок',
             data: <?= json_encode(array_column($completedData, 'count'))?>,
+            backgroundColor: 'rgba(255, 255, 255, 0.2)',
+            borderColor: 'rgba(255, 255, 255, 1)',
+            borderWidth: 1
+          }]
+        },
+        options: {
+          scales: {
+            y: {
+              beginAtZero: true
+            }
+          },
+          plugins: {
+            legend: {
+              display: false
+            }
+          }
+        }
+      }); 
+
+      const ctxRedenkov = document.getElementById('redenkov-chart').getContext('2d');
+      const chartRedenkov = new Chart(ctxRedenkov, {
+        type: 'line',
+        data: {
+          labels: <?= json_encode(array_column($redenkovData, 'date'))?>,
+          datasets: [{
+            label: 'Количество заявок',
+            data: <?= json_encode(array_column($redenkovData, 'count'))?>,
             backgroundColor: 'rgba(255, 255, 255, 0.2)',
             borderColor: 'rgba(255, 255, 255, 1)',
             borderWidth: 1

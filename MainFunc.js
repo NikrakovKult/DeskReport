@@ -1,15 +1,19 @@
 $(document).ready(function() {
     // Функция для загрузки данных из таблицы orders
-    function loadOrders(status) {
-      $.ajax({
-        type: "POST",
-        url: "load_orders.php",
-        data: {status: status},
-        dataType: "html",
-        success: function(data) {
-          $(".main-table").html(data);
-        }
-      });
+    function loadOrders(status, specialist) {
+        $.ajax({
+            type: "POST",
+            url: "load_orders.php",
+            data: {
+                status: status,
+                specialist: specialist,
+                username: '<?php echo $user_data["username"]; ?>' // добавляем username в данные
+            },
+            dataType: "html",
+            success: function(data) {
+                $(".main-table").html(data);
+            }
+        });
     }
   
     // Вызов функции loadOrders при загрузке страницы
@@ -67,6 +71,7 @@ $(document).ready(function() {
             }
         });
     });
+    
 });
 
 function showActivesTable() {
@@ -83,5 +88,10 @@ function showGraph() {
     document.getElementById("orders-table").style.display = "none";
     document.getElementById("actives-table").style.display = "none";
     document.getElementsByClassName("graph")[0].style.display = "flex";
+}
+function showZametki() {
+    document.getElementById("orders-table").style.display = "none";
+    document.getElementById("actives-table").style.display = "none";
+    document.getElementsByClassName("graph")[0].style.display = "none";
 }
 

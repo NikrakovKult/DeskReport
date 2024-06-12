@@ -75,8 +75,61 @@ if (isset($_SESSION["id"])) {
 
 <body>
     <div class="info">
-
+        <h2 id="header"></h2>
+        <p id="datetime"></p>
+        <p id="weather">
+            <img id="weather-icon" src="" alt="Weather icon">
+            <span id="weather-text"></span>
+        </p>
     </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const headerElement = document.getElementById('header');
+            const datetimeElement = document.getElementById('datetime');
+            const weatherElement = document.getElementById('weather');
+            const weatherIconElement = document.getElementById('weather-icon');
+            const weatherTextElement = document.getElementById('weather-text');
+
+            if (!headerElement || !datetimeElement || !weatherElement || !weatherIconElement || !weatherTextElement) {
+                console.error('Elements not found');
+            } else {
+                headerElement.textContent = 'DeskPlusReport';
+
+                function updateDateTime() {
+                    console.log('Updating datetime');
+                    const now = new Date();
+                    const dayOfWeek = ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'][now.getDay()];
+                    const datetimeString = `${dayOfWeek}, ${now.toLocaleDateString()} ${now.toLocaleTimeString()}`;
+                    console.log(datetimeString);
+                    datetimeElement.textContent = datetimeString;
+                }
+
+                function updateWeather() {
+                    console.log('Updating weather');
+                    const apiKey = '396fe9f178d41a59cfcdfa26642db76e'; // замените на свой API ключ
+                    const city = 'Nizhny Tagil'; // замените на свой город
+                    const url = `http://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`;
+
+                    fetch(url)
+                        .then(response => response.json())
+                        .then(data => {
+                            const weatherIconUrl = `http://openweathermap.org/img/w/${data.weather[0].icon}.png`;
+                            weatherIconElement.src = weatherIconUrl;
+                            const weatherString = `Погода: ${data.weather[0].description}, температура: ${data.main.temp}°C`;
+                            console.log(weatherString);
+                            weatherTextElement.textContent = weatherString;
+                        })
+                        .catch(error => console.error('Error fetching weather data:', error));
+                }
+
+                updateDateTime();
+                updateWeather();
+                setInterval(updateDateTime, 1000);
+                setInterval(updateWeather, 60000); // обновляем погоду каждые 60 секунд
+            }
+        });
+    </script>
     <div class="nav-sidebar">
         <nav class="nav">
             <a href="#" class="nav-item" active-color="blue" onclick="showOrdersTable()">Заявки</a>
@@ -86,7 +139,8 @@ if (isset($_SESSION["id"])) {
                 Сотрудники</a>
             <a href="#" class="nav-item" active-color="blue"><i class='fa fa-address-card'></i>Адресная книга
                 клиенты</a>
-            <a href="#" class="nav-item" active-color="blue"><i class='fa fa-sticky-note'></i>Заметки</a>
+            <a href="#" class="nav-item" active-color="blue" onclick="showZametki()"><i
+                    class='fa fa-sticky-note'></i>Заметки</a>
             <a href="#" class="nav-item" active-color="blue"><i class='fa fa-tasks'></i>Задачи</a>
             <a href="#" class="nav-item" active-color="blue" onclick="showGraph()"><i class='fa fa-tasks'></i>Анализ</a>
             <span class="nav-indicator"></span>
@@ -102,9 +156,9 @@ if (isset($_SESSION["id"])) {
             <option value="Завершено">Завершено</option>
         </select>
         <select name="specialist" id="specialist" onchange="updateTable(this.value)">
-        <option value="">Все специалисты</option>
-        <option value="<?php echo $user_data['username'];?>">Мои заявки</option>
-    </select>
+            <option value="">Все специалисты</option>
+            <option value="<?php echo $user_data['username']; ?>">Мои заявки</option>
+        </select>
     </div>
     <div class="user-info">
         <p> <?php echo $user_data['username']; ?></p>
@@ -116,7 +170,7 @@ if (isset($_SESSION["id"])) {
         <?php
 
         if (isset($_SESSION['id'])) {
-            $sql = "SELECT * FROM orders";
+            $sql = "SELECT * FROM orders ORDER BY Date_by DESC";
             if (isset($_POST['searchQuery'])) {
                 $searchQuery = $_POST['searchQuery'];
                 $sql = "SELECT * FROM orders WHERE Discrip LIKE? OR Sender LIKE? OR Specialist LIKE?";
@@ -183,7 +237,7 @@ if (isset($_SESSION["id"])) {
             $result = $stmt->get_result();
 
             // Создание таблицы
-            echo "<table border='0' id='actives-table' ";
+            echo "<table border='0' id='actives-table'  ";
             echo "<thead>
           <tr id='head'>
             <th>ID</th>
@@ -242,44 +296,43 @@ if (isset($_SESSION["id"])) {
             $monday = date('Y-m-d', strtotime('monday this week'));
             $sunday = date('Y-m-d', strtotime('sunday this week'));
 
+            $daysOfWeek = ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'];
+            $newData = array_fill(0, 7, 0);
+            $inWorkData = array_fill(0, 7, 0);
+            $pausedData = array_fill(0, 7, 0);
+            $completedData = array_fill(0, 7, 0);
+            $redenkovData = array_fill(0, 7, 0);
+
             $query = "SELECT Date_by, COUNT(*) as count FROM orders WHERE Status = 'Новая' AND Date_by BETWEEN '$monday' AND '$sunday' GROUP BY Date_by";
             $result = mysqli_query($conn, $query);
-            $newData = [];
             while ($row = mysqli_fetch_assoc($result)) {
-                $newData[] = [
-                    'date' => $row['Date_by'],
-                    'count' => $row['count']
-                ];
+                $date = $row['Date_by'];
+                $dayOfWeek = date('w', strtotime($date)); // 0 = Sunday, 1 = Monday,..., 6 = Saturday
+                $newData[$dayOfWeek] += $row['count']; // суммируем количество заявок для каждого дня недели
             }
 
             $query = "SELECT Date_by, COUNT(*) as count FROM orders WHERE Status = 'В работе' AND Date_by BETWEEN '$monday' AND '$sunday' GROUP BY Date_by";
             $result = mysqli_query($conn, $query);
-            $inWorkData = [];
             while ($row = mysqli_fetch_assoc($result)) {
-                $inWorkData[] = [
-                    'date' => $row['Date_by'],
-                    'count' => $row['count']
-                ];
+                $date = $row['Date_by'];
+                $dayOfWeek = date('w', strtotime($date)); // 0 = Sunday, 1 = Monday,..., 6 = Saturday
+                $inWorkData[$dayOfWeek] += $row['count']; // суммируем количество заявок для каждого дня недели
             }
 
             $query = "SELECT Date_by, COUNT(*) as count FROM orders WHERE Status = 'Приостановлено' AND Date_by BETWEEN '$monday' AND '$sunday' GROUP BY Date_by";
             $result = mysqli_query($conn, $query);
-            $pausedData = [];
             while ($row = mysqli_fetch_assoc($result)) {
-                $pausedData[] = [
-                    'date' => $row['Date_by'],
-                    'count' => $row['count']
-                ];
+                $date = $row['Date_by'];
+                $dayOfWeek = date('w', strtotime($date)); // 0 = Sunday, 1 = Monday,..., 6 = Saturday
+                $pausedData[$dayOfWeek] += $row['count']; // суммируем количество заявок для каждого дня недели
             }
 
             $query = "SELECT Date_by, COUNT(*) as count FROM orders WHERE Status = 'Завершено' AND Date_by BETWEEN '$monday' AND '$sunday' GROUP BY Date_by";
             $result = mysqli_query($conn, $query);
-            $completedData = [];
             while ($row = mysqli_fetch_assoc($result)) {
-                $completedData[] = [
-                    'date' => $row['Date_by'],
-                    'count' => $row['count']
-                ];
+                $date = $row['Date_by'];
+                $dayOfWeek = date('w', strtotime($date)); // 0 = Sunday, 1 = Monday,..., 6 = Saturday
+                $completedData[$dayOfWeek] += $row['count']; // суммируем количество заявок для каждого дня недели
             }
             $username = $user_data['username'];
             $query = "SELECT Date_by, COUNT(*) as count FROM orders WHERE Sender =? AND Date_by BETWEEN '$monday' AND '$sunday' GROUP BY Date_by";
@@ -301,10 +354,10 @@ if (isset($_SESSION["id"])) {
                 const chartNew = new Chart(ctxNew, {
                     type: 'line',
                     data: {
-                        labels: <?= json_encode(array_column($newData, 'date')) ?>,
+                        labels: <?= json_encode($daysOfWeek) ?>,
                         datasets: [{
                             label: 'Количество заявок',
-                            data: <?= json_encode(array_column($newData, 'count')) ?>,
+                            data: <?= json_encode($newData) ?>,
                             backgroundColor: 'rgba(255, 255, 255, 0.2)',
                             borderColor: 'rgba(255, 255, 255, 1)',
                             borderWidth: 1
@@ -313,8 +366,7 @@ if (isset($_SESSION["id"])) {
                     options: {
                         scales: {
                             y: {
-                                beginAtZero: true,
-                                stepSize: 1
+                                beginAtZero: true
                             }
                         },
                         plugins: {
@@ -324,15 +376,14 @@ if (isset($_SESSION["id"])) {
                         }
                     }
                 });
-
                 const ctxInWork = document.getElementById('in-work-chart').getContext('2d');
                 const chartInWork = new Chart(ctxInWork, {
                     type: 'line',
                     data: {
-                        labels: <?= json_encode(array_column($inWorkData, 'date')) ?>,
+                        labels: <?= json_encode($daysOfWeek) ?>,
                         datasets: [{
                             label: 'Количество заявок',
-                            data: <?= json_encode(array_column($inWorkData, 'count')) ?>,
+                            data: <?= json_encode($inWorkData) ?>,
                             backgroundColor: 'rgba(255, 255, 255, 0.2)',
                             borderColor: 'rgba(255, 255, 255, 1)',
                             borderWidth: 1
@@ -341,8 +392,7 @@ if (isset($_SESSION["id"])) {
                     options: {
                         scales: {
                             y: {
-                                beginAtZero: true,
-                                stepSize: 1
+                                beginAtZero: true
                             }
                         },
                         plugins: {
@@ -356,10 +406,10 @@ if (isset($_SESSION["id"])) {
                 const chartPaused = new Chart(ctxPaused, {
                     type: 'line',
                     data: {
-                        labels: <?= json_encode(array_column($pausedData, 'date')) ?>,
+                        labels: <?= json_encode($daysOfWeek) ?>,
                         datasets: [{
                             label: 'Количество заявок',
-                            data: <?= json_encode(array_column($pausedData, 'count')) ?>,
+                            data: <?= json_encode($pausedData) ?>,
                             backgroundColor: 'rgba(255, 255, 255, 0.2)',
                             borderColor: 'rgba(255, 255, 255, 1)',
                             borderWidth: 1
@@ -368,8 +418,7 @@ if (isset($_SESSION["id"])) {
                     options: {
                         scales: {
                             y: {
-                                beginAtZero: true,
-                                stepSize: 1
+                                beginAtZero: true
                             }
                         },
                         plugins: {
@@ -384,10 +433,10 @@ if (isset($_SESSION["id"])) {
                 const chartCompleted = new Chart(ctxCompleted, {
                     type: 'line',
                     data: {
-                        labels: <?= json_encode(array_column($completedData, 'date')) ?>,
+                        labels: <?= json_encode($daysOfWeek) ?>,
                         datasets: [{
                             label: 'Количество заявок',
-                            data: <?= json_encode(array_column($completedData, 'count')) ?>,
+                            data: <?= json_encode($completedData) ?>,
                             backgroundColor: 'rgba(255, 255, 255, 0.2)',
                             borderColor: 'rgba(255, 255, 255, 1)',
                             borderWidth: 1
@@ -396,18 +445,17 @@ if (isset($_SESSION["id"])) {
                     options: {
                         scales: {
                             y: {
-                                beginAtZero: true,
-                                stepSize: 1
+                                beginAtZero: true
                             }
                         },
                         plugins: {
                             legend: {
                                 display: false
-
                             }
                         }
                     }
                 });
+
                 const ctxMyOrders = document.getElementById('my-orders-chart').getContext('2d');
                 const chartMyOrders = new Chart(ctxMyOrders, {
                     type: 'line',
