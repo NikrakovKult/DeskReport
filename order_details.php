@@ -165,7 +165,22 @@ require_once('connect.php');
 
         mysqli_close($conn);
     }
+    if (isset($_GET['action']) && $_GET['action'] == 'add') {
+        // Создаем новую заявку
+        $sql = "INSERT INTO orders (Discrip, Sender, Specialist, Date_by, Status, Photo1, Photo2, Photo3) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("sssss", $discrip, $sender, $specialist, $date_by, $status);
+        $discrip = '';
+        $sender = '';
+        $specialist = '';
+        $date_by = date('Y-m-d H:i:s');
+        $status = 'Новая';
+        $stmt->execute();
+        header('Location: Main.php');
+        exit;
+    }
     ?>
+    
 </body>
 
 </html>

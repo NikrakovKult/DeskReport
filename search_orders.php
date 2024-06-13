@@ -1,6 +1,38 @@
 <?php
 require_once('connect.php');
-
+if (isset($_POST['update'])) {
+    $sql = "SELECT * FROM orders ORDER BY Date_by DESC";
+    $stmt = $conn->prepare($sql);
+    $stmt->execute();
+    $result = $stmt->get_result();
+  
+    // Создание таблицы
+    echo "<table border='0' id='orders-table'>";
+    echo "<thead>
+      <tr id='head'>
+        <th>ID</th>
+        <th>Описание</th>
+        <th>Отправитель</th>
+        <th>Специалист</th>
+        <th>Дата Создания</th>
+        <th>Статус</th>
+      </tr>
+    </thead>";
+  
+    // Вывод данных из таблицы
+    while ($row = mysqli_fetch_assoc($result)) {
+      echo "<tr>";
+      echo "<td><a href='order_details.php?id=". $row['id']. "'>". $row['id']. "</a></td>";
+      echo "<td><a href='order_details.php?id=". $row['id']. "'>". $row['Discrip']. "</a></td>";
+      echo "<td><a href='order_details.php?id=". $row['id']. "'>". $row['Sender']. "</a></td>";
+      echo "<td><a href='order_details.php?id=". $row['id']. "'>". $row['Specialist']. "</a></td>";
+      echo "<td><a href='order_details.php?id=". $row['id']. "'>". $row['Date_by']. "</a></td>";
+      echo "<td class='". getStatusClass($row['Status']). "'>". $row['Status']. "</td>";
+      echo "</tr>";
+    }
+  
+    echo "</table>";
+  }
 if (isset($_POST['searchQuery']) && isset($_POST['status'])) {
     $searchQuery = $_POST['searchQuery'];
     $status = $_POST['status'];
@@ -45,7 +77,7 @@ if (isset($_POST['searchQuery']) && isset($_POST['status'])) {
             echo "<td><a href='order_details.php?id=". $row['id']. "'>". $row['Sender']. "</a></td>";
             echo "<td><a href='order_details.php?id=". $row['id']. "'>". $row['Specialist']. "</a></td>";
             echo "<td><a href='order_details.php?id=". $row['id']. "'>". $row['Date_by']. "</a></td>";
-            echo "<td><a href='order_details.php?id=". $row['id']. "'>". $row['Status']. "</a></td>";
+            echo "<td class='" . getStatusClass($row['Status']) . "'>" . $row['Status'] . "</td>";
             echo "</tr>";
         }
 
@@ -56,4 +88,20 @@ if (isset($_POST['searchQuery']) && isset($_POST['status'])) {
 } else {
     echo "";
 }
+function getStatusClass($status)
+        {
+            switch ($status) {
+                case 'Новая':
+                    return 'new-status';
+                case 'В работе':
+                    return 'in-work-status';
+                case 'Приостановлено':
+                    return 'paused-status';
+                case 'Завершено':
+                    return 'completed-status';
+                default:
+                    return '';
+            }
+        }
+        
 ?>

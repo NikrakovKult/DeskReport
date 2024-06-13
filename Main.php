@@ -142,7 +142,8 @@ if (isset($_SESSION["id"])) {
             <a href="#" class="nav-item" active-color="blue" onclick="showZametki()"><i
                     class='fa fa-sticky-note'></i>Заметки</a>
             <a href="#" class="nav-item" active-color="blue"><i class='fa fa-tasks'></i>Задачи</a>
-            <a href="#" class="nav-item" active-color="blue" onclick="showGraph()"><i class='fa fa-tasks'></i>Анализ</a>
+            <a href="#" class="nav-item" active-color="blue" onclick="showGraph()"><i
+                    class="fa fa-bar-chart"></i>Анализ</a>
             <span class="nav-indicator"></span>
         </nav>
     </div>
@@ -159,6 +160,14 @@ if (isset($_SESSION["id"])) {
             <option value="">Все специалисты</option>
             <option value="<?php echo $user_data['username']; ?>">Мои заявки</option>
         </select>
+        <button id="update-button">Обновить таблицу</button>
+        <select id="update-interval">
+            <option value="0">Не обновлять</option>
+            <option value="10">Каждые 10 секунд</option>
+            <option value="20">Каждые 20 секунд</option>
+            <option value="60">Каждую 1 минуту</option>
+        </select>
+        <button id="add-button" "><a href="NewOrder.php">Добавить</a></button>
     </div>
     <div class="user-info">
         <p> <?php echo $user_data['username']; ?></p>
@@ -166,9 +175,7 @@ if (isset($_SESSION["id"])) {
     </div>
 
     <div class="main-table">
-<script>
-    
-</script>
+
         <?php
 
         if (isset($_SESSION['id'])) {
@@ -222,7 +229,7 @@ if (isset($_SESSION["id"])) {
                 echo "<td><a href='order_details.php?id=" . $row['id'] . "'>" . $row['Sender'] . "</a></td>";
                 echo "<td><a href='order_details.php?id=" . $row['id'] . "'>" . $row['Specialist'] . "</a></td>";
                 echo "<td><a href='order_details.php?id=" . $row['id'] . "'>" . $row['Date_by'] . "</a></td>";
-                echo "<td class='" . getStatusClass($row['Status']) . "'>" . $row['Status'] . "</td>"; 
+                echo "<td class='" . getStatusClass($row['Status']) . "'>" . $row['Status'] . "</td>";
 
                 echo "</tr>";
 
@@ -230,7 +237,8 @@ if (isset($_SESSION["id"])) {
 
             echo "</table>";
         }
-        function getStatusClass($status) {
+        function getStatusClass($status)
+        {
             switch ($status) {
                 case 'Новая':
                     return 'new-status';
@@ -245,7 +253,7 @@ if (isset($_SESSION["id"])) {
             }
         }
         ?>
-        
+
         <?php
         if (isset($_SESSION['id'])) {
             $sql = "SELECT * FROM actives";
@@ -305,11 +313,9 @@ if (isset($_SESSION["id"])) {
                 <h2>Завершенные заявки</h2>
                 <canvas id="completed-chart"></canvas>
             </div>
-            <div style="width: 20%; color:white; margin:10px;">
-                <h2>Мои заявки</h2>
-                <canvas id="my-orders-chart"></canvas>
-            </div>
+
             <?PHP
+
             $monday = date('Y-m-d', strtotime('monday this week'));
             $sunday = date('Y-m-d', strtotime('sunday this week'));
 
@@ -318,7 +324,7 @@ if (isset($_SESSION["id"])) {
             $inWorkData = array_fill(0, 7, 0);
             $pausedData = array_fill(0, 7, 0);
             $completedData = array_fill(0, 7, 0);
-            $redenkovData = array_fill(0, 7, 0);
+
 
             $query = "SELECT Date_by, COUNT(*) as count FROM orders WHERE Status = 'Новая' AND Date_by BETWEEN '$monday' AND '$sunday' GROUP BY Date_by";
             $result = mysqli_query($conn, $query);
@@ -351,19 +357,15 @@ if (isset($_SESSION["id"])) {
                 $dayOfWeek = date('w', strtotime($date)); // 0 = Sunday, 1 = Monday,..., 6 = Saturday
                 $completedData[$dayOfWeek] += $row['count']; // суммируем количество заявок для каждого дня недели
             }
-            $username = $user_data['username'];
-            $query = "SELECT Date_by, COUNT(*) as count FROM orders WHERE Sender =? AND Date_by BETWEEN '$monday' AND '$sunday' GROUP BY Date_by";
-            $stmt = $conn->prepare($query);
-            $stmt->bind_param("s", $username);
-            $stmt->execute();
-            $result = $stmt->get_result();
-            $myOrdersData = [];
-            while ($row = mysqli_fetch_assoc($result)) {
-                $myOrdersData[] = [
-                    'date' => $row['Date_by'],
-                    'count' => $row['count']
-                ];
-            }
+            $data = array(
+                'newData' => $newData,
+                'inWorkData' => $inWorkData,
+                'pausedData' => $pausedData,
+                'completedData' => $completedData,
+
+            );
+
+
             ?>
 
             <script>
@@ -473,33 +475,35 @@ if (isset($_SESSION["id"])) {
                     }
                 });
 
-                const ctxMyOrders = document.getElementById('my-orders-chart').getContext('2d');
-                const chartMyOrders = new Chart(ctxMyOrders, {
-                    type: 'line',
-                    data: {
-                        labels: <?= json_encode(array_column($myOrdersData, 'date')) ?>,
-                        datasets: [{
-                            label: 'Количество заявок',
-                            data: <?= json_encode(array_column($myOrdersData, 'count')) ?>,
-                            backgroundColor: 'rgba(255, 255, 255, 0.2)',
-                            borderColor: 'rgba(255, 255, 255, 1)',
-                            borderWidth: 1
-                        }]
-                    },
-                    options: {
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                stepSize: 1
-                            }
-                        },
-                        plugins: {
-                            legend: {
-                                display: false
-                            }
-                        }
-                    }
-                });
+
+
+
+                function updateCharts() {
+    // Отправляем запрос на сервер для получения новых данных
+    fetch('get_new_data.php')
+       .then(response => response.json())
+       .then(data => {
+            // Обновляем данные графиков
+            chartNew.data.datasets[0].data = data.newData;
+            chartInWork.data.datasets[0].data = data.inWorkData;
+            chartPaused.data.datasets[0].data = data.pausedData;
+            chartCompleted.data.datasets[0].data = data.completedData;
+
+            // Обновляем графики
+            chartNew.update();
+            chartInWork.update();
+            chartPaused.update();
+            chartCompleted.update();
+        });
+}
+
+// Вызываем функцию updateCharts каждые 10 секунд
+setInterval(updateCharts, 10000);
+
+                //...
+
+                // Обновляем графики
+
             </script>
         </div>
 

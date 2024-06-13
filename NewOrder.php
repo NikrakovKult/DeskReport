@@ -55,7 +55,7 @@
         mysqli_close($conn);
 
         // Перенаправление на страницу благодарности
-        header('Location: Login.php');
+        // header('Location: Login.php');
         exit;
     }
     ?>
