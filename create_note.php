@@ -19,14 +19,9 @@ mysqli_stmt_bind_param($stmt, "iss", $user_id, $title, $text);
 mysqli_stmt_execute($stmt);
 
 // Выводим блок заметки в формате JSON
-$response = array('note' => '<div class="note"><h2>'. $title. '</h2><p>'. $text. '</p></div>');
+$response = array('id' => mysqli_insert_id($conn), 'title' => $title, 'text' => $text, 'success' => true);
 echo json_encode($response);
-echo json_encode(array(
-  'id' => $note_id,
-  'title' => $title,
-  'text' => $text,
-  'success' => true
-));
+
 // Закрываем соединение
 mysqli_close($conn);
 ?>

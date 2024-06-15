@@ -508,105 +508,109 @@ if (isset($_SESSION["id"])) {
         </div>
 
         <div class="notes">
-            <button id="create-note-btn">Создать заметку</button>
-            <!-- Модальное окно для создания заметки -->
-            <div id="modal-create-note">
-                <form id="create-note-form">
-                    <label for="title">Заголовок:</label>
-                    <input type="text" id="title" name="title"><br><br>
-                    <label for="text">Текст:</label>
-                    <textarea id="text" name="text"></textarea><br><br>
-                    <button id="save-note-btn">Сохранить</button>
-                </form>
-            </div>
+  <button id="create-note-btn">Создать заметку</button>
+  <!-- Модальное окно для создания заметки -->
+  <div id="modal-create-note">
+    <form id="create-note-form">
+      <label for="title">Заголовок:</label>
+      <input type="text" id="title" name="title"><br><br>
+      <label for="text">Текст:</label>
+      <textarea id="text" name="text"></textarea><br><br>
+      <button id="save-note-btn">Сохранить</button>
+      <button id="close-modal-btn">✕</button>
+    </form>
+  </div>
 
-            <!-- Блок для отображения заметок -->
-            <div id="notes-block">
+  <!-- Блок для отображения заметок -->
+  <div id="notes-block">
 
-                <?php
-                $current_user_id = $_SESSION["id"];
-                // Получаем все заметки, созданные текущим пользователем
-                $query = "SELECT * FROM zametki WHERE user_id =?";
-                $stmt = $conn->prepare($query);
-                $stmt->bind_param("i", $current_user_id);
-                $stmt->execute();
-                $result = $stmt->get_result();
+    <?php
+    $current_user_id = $_SESSION["id"];
+    // Получаем все заметки, созданные текущим пользователем
+    $query = "SELECT * FROM zametki WHERE user_id =?";
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param("i", $current_user_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
 
-                while ($row = mysqli_fetch_assoc($result)) {
-                    echo '<div class="note">
+    while ($row = mysqli_fetch_assoc($result)) {
+      echo '<div class="note">
                   <button class="delete-note-btn" data-note-id="' . $row['id'] . '">✕</button>
-                  <button class="delete-block-btn" data-block-id="' . $row['id'] . '">Удалить блок</button>
+                 
                   <h2>' . $row['Title'] . '</h2>
                   <p>' . $row['Text'] . '</p>
               </div>';
-                }
-                ?>
-            </div>
+    }
+    ?>
+  </div>
 
-            <script>
-                document.getElementById('create-note-btn').addEventListener('click', function () {
-                    document.getElementById('modal-create-note').style.display = 'block';
-                });
-                document.addEventListener('click', function (event) {
-                    if (event.target.classList.contains('delete-note-btn')) {
-                        var noteId = event.target.getAttribute('data-note-id');
-                        fetch('delete_note.php', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/x-www-form-urlencoded'
-                            },
-                            body: 'id=' + noteId
-                        })
-                            .then(response => response.json())
-                            .then(data => {
-                                if (data.success) {
-                                    event.target.parentNode.remove();
-                                } else {
-                                    alert('Ошибка удаления заметки');
-                                }
-                            });
-                    }
-                    if (event.target.classList.contains('delete-block-btn')) {
-                        var blockId = event.target.getAttribute('data-block-id');
-                        fetch('delete_block.php', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/x-www-form-urlencoded'
-                            },
-                            body: 'id=' + blockId
-                        })
-                            .then(response => response.json())
-                            .then(data => {
-                                if (data.success) {
-                                    event.target.parentNode.parentNode.remove();
-                                } else {
-                                    alert('Ошибка удаления блока');
-                                }
-                            });
-                    }
-                });
-                document.getElementById('save-note-btn').addEventListener('click', function (event) {
-                    event.preventDefault();
-                    var formData = new FormData(document.getElementById('create-note-form'));
-                    formData.append('user_id', '<?php echo $_SESSION["id"]; ?>'); // добавляем ID пользователя к форме
-                    fetch('create_note.php', {
-                        method: 'POST',
-                        body: formData
-                    })
-                        .then(response => response.json())
-                        .then(data => {
-                            document.getElementById('modal-create-note').style.display = 'none';
-                            var noteHTML = '<div class="note">' +
-                                '<button class="delete-note-btn" data-note-id="' + data.id + '">✕</button>' +
-                                '<button class="delete-block-btn" data-block-id="' + data.id + '">Удалить блок</button>' +
-                                '<h2>' + data.title + '</h2>' +
-                                '<p>' + data.text + '</p>' +
-                                '</div>';
-                            document.getElementById('notes-block').innerHTML += noteHTML;
-                        });
-                });
-            </script>
-        </div>
+  <script>
+    document.getElementById('create-note-btn').addEventListener('click', function () {
+      document.getElementById('modal-create-note').style.display = 'block';
+    });
+    document.getElementById('close-modal-btn').addEventListener('click', function () {
+      document.getElementById('modal-create-note').style.display = 'none';
+    });
+    document.addEventListener('click', function (event) {
+      if (event.target.classList.contains('delete-note-btn')) {
+        var noteId = event.target.getAttribute('data-note-id');
+        fetch('delete_note.php', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          },
+          body: 'id=' + noteId
+        })
+          .then(response => response.json())
+          .then(data => {
+            if (data.success) {
+              event.target.parentNode.remove();
+            } else {
+              alert('Ошибка удаления заметки');
+            }
+          });
+      }
+      if (event.target.classList.contains('delete-block-btn')) {
+        var blockId = event.target.getAttribute('data-block-id');
+        fetch('delete_block.php', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          },
+          body: 'id=' + blockId
+        })
+          .then(response => response.json())
+          .then(data => {
+            if (data.success) {
+              event.target.parentNode.parentNode.remove();
+            } else {
+              alert('Ошибка удаления блока');
+            }
+          });
+      }
+    });
+    document.getElementById('save-note-btn').addEventListener('click', function (event) {
+      event.preventDefault();
+      var formData = new FormData(document.getElementById('create-note-form'));
+      formData.append('user_id', '<?php echo $_SESSION["id"]; ?>'); // добавляем ID пользователя к форме
+      fetch('create_note.php', {
+        method: 'POST',
+        body: formData
+      })
+        .then(response => response.json())
+        .then(data => {
+          document.getElementById('modal-create-note').style.display = 'none';
+          var noteHTML = '<div class="note">' +
+            '<button class="delete-note-btn" data-note-id="' + data.id + '">✕</button>' +
+            
+            '<h2>' + data.title + '</h2>' +
+            '<p>' + data.text + '</p>' +
+            '</div>';
+          document.getElementById('notes-block').innerHTML += noteHTML;
+        });
+    });
+  </script>
+</div>
 
 
 

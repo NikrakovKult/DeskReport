@@ -76,6 +76,65 @@ grid-row-gap: 0px;
 .nav-item:not(.is-active):hover {
   color: #71eeff8e;
 }
+#close-modal-btn {
+  margin-bottom: 5px;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  border: 1px solid white;
+  color: rgb(0, 0, 0);
+  border-radius: 30px;
+  background: none;
+  transition: 0.3s;
+}
+
+#close-modal-btn:hover {
+  margin-bottom: 5px;
+  border: 1px solid white;
+  color: rgb(0, 0, 0);
+  border-radius: 30px;
+  background: red;
+  transition: 0.3s;
+}
+
+.modal-header {
+  position: relative;
+  padding: 10px;
+  border-bottom: 1px solid #ccc;
+}
+.delete-note-btn {
+  border: 1px solid white;
+    color: white;
+    border-radius: 30px;
+    background: none;
+    float: inline-end;
+    transition: 0.3s;
+}
+.delete-note-btn:hover{
+  border: 1px solid white;
+    color: rgb(0, 0, 0);
+    border-radius: 30px;
+    background: red;
+    float: inline-end;
+    transition: 0.3s;
+}
+#create-note-btn{
+  padding: 10px;
+    color: white;
+    border-radius: 15px;
+    border: 1px solid white;
+    background: none;
+    transition: 0.5s;
+}
+
+#create-note-btn:hover{
+  padding: 10px;
+    color: white;
+    border-radius: 15px;
+    border: 1px solid rgb(255, 255, 255);
+    background:#0000004d;
+    transition: 0.5s;
+}
 
 #header {
   font-weight: 600;
@@ -354,8 +413,18 @@ th {
 }
 #notes-block {
   display: grid;
-  grid-template-columns: repeat(3, 1fr); /* 3 columns */
+  grid-template-columns: repeat(3, 33%); /* 3 columns */
   grid-gap: 10px;
+  white-space: normal; /* разрешаем перенос строк */
+  word-wrap: break-word; /* разрешаем перенос слов */
+  width: 100%; /* устанавливаем ширину ячеек таблицы как 100% */
+  margin-right: 0; /* удаляем боковой отступ */
+  border-right: none; /* удаляем границу справа */
+  padding: 10px; /* добавляем отступ */
+  border-radius: 15px; /* добавляем закругленные углы */
+  color: white; /* устанавливаем цвет текста */
+  background-color: transparent; /* устанавливаем прозрачный фон */
+  text-align: lext; /* выравниваем текст по центру */
 }
 #create-note-btn{
   margin-bottom: 10px
@@ -370,13 +439,32 @@ th {
     margin-bottom: 10px;
 }
 #modal-create-note {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background-color: #fff;
-  padding: 20px;
-  border: 1px solid #ccc;
-  display: none;
-  z-index: 1000; /* добавляем высокий z-index */
+  border-radius: 15px;
+  color: rgb(0, 0, 0);
+    background-color: rgba(255, 255, 255, 0.473);
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 20px;
+    border: 1px solid #ccc;
+    display: none;
+    z-index: 1000;
 }
+#save-note-btn{
+  padding: 10px;
+    color: black;
+    border-radius: 15px;
+    border: 1px solid black;
+    background: none;
+    transition: 0.2s;
+}
+#save-note-btn:hover{
+  padding: 10px;
+    color: rgb(255, 255, 255);
+    border-radius: 15px;
+    border: 1px solid black;
+    background:#00000088;
+    transition: 0.2s;
+}
+

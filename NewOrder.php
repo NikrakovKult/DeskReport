@@ -49,7 +49,7 @@
             $photo3 = $photo_paths[2];
         }
 
-        $query = "INSERT INTO orders (Discrip, Sender, Specialist, Date_by, Status, Photo1, Photo2, Photo3) VALUES ('$discrip', '$fio', 'Не назначенно', NOW(), 'Новая', '$photo1', '$photo2', '$photo3')";
+$query = "INSERT INTO orders (Discrip, Sender, Specialist, Date_by, Status, Photo1, Photo2, Photo3) VALUES ('$discrip', '$fio', 'Не назначенно', NOW(), 'Новая', '$photo1', '$photo2', '$photo3')";        
         mysqli_query($conn, $query);
 
         mysqli_close($conn);
