@@ -1,235 +1,78 @@
-<?php
-$conn = mysqli_connect("localhost", "root", "", "DeskReport");
-
-if (!$conn) {
-  die("Connection failed: ". mysqli_connect_error());
-}
-
-$monday = date('Y-m-d', strtotime('monday this week'));
-$sunday = date('Y-m-d', strtotime('sunday this week'));
-
-$daysOfWeek = ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'];
-$newData = array_fill(0, 7, 0);
-$inWorkData = array_fill(0, 7, 0);
-$pausedData = array_fill(0, 7, 0);
-$completedData = array_fill(0, 7, 0);
-$redenkovData = array_fill(0, 7, 0);
-
-$query = "SELECT Date_by, COUNT(*) as count FROM orders WHERE Status = 'Новая' AND Date_by BETWEEN '$monday' AND '$sunday' GROUP BY Date_by";
-$result = mysqli_query($conn, $query);
-while ($row = mysqli_fetch_assoc($result)) {
-  $date = $row['Date_by'];
-  $dayOfWeek = date('w', strtotime($date)); // 0 = Sunday, 1 = Monday,..., 6 = Saturday
-  $newData[$dayOfWeek] += $row['count']; // суммируем количество заявок для каждого дня недели
-}
-
-$query = "SELECT Date_by, COUNT(*) as count FROM orders WHERE Status = 'В работе' AND Date_by BETWEEN '$monday' AND '$sunday' GROUP BY Date_by";
-$result = mysqli_query($conn, $query);
-while ($row = mysqli_fetch_assoc($result)) {
-  $date = $row['Date_by'];
-  $dayOfWeek = date('w', strtotime($date)); // 0 = Sunday, 1 = Monday,..., 6 = Saturday
-  $inWorkData[$dayOfWeek] += $row['count']; // суммируем количество заявок для каждого дня недели
-}
-
-$query = "SELECT Date_by, COUNT(*) as count FROM orders WHERE Status = 'Приостановлено' AND Date_by BETWEEN '$monday' AND '$sunday' GROUP BY Date_by";
-$result = mysqli_query($conn, $query);
-while ($row = mysqli_fetch_assoc($result)) {
-  $date = $row['Date_by'];
-  $dayOfWeek = date('w', strtotime($date)); // 0 = Sunday, 1 = Monday,..., 6 = Saturday
-  $pausedData[$dayOfWeek] += $row['count']; // суммируем количество заявок для каждого дня недели
-}
-
-$query = "SELECT Date_by, COUNT(*) as count FROM orders WHERE Status = 'Завершено' AND Date_by BETWEEN '$monday' AND '$sunday' GROUP BY Date_by";
-$result = mysqli_query($conn, $query);
-while ($row = mysqli_fetch_assoc($result)) {
-  $date = $row['Date_by'];
-  $dayOfWeek = date('w', strtotime($date)); // 0 = Sunday, 1 = Monday,..., 6 = Saturday
-  $completedData[$dayOfWeek] += $row['count']; // суммируем количество заявок для каждого дня недели
-}
-
-$query = "SELECT Date_by, COUNT(*) as count FROM orders WHERE Specialist = 'Реденков Никита Олегович' AND Date_by BETWEEN '$monday' AND '$sunday' GROUP BY Date_by";
-$result = mysqli_query($conn, $query);
-while ($row = mysqli_fetch_assoc($result)) {
-  $date = $row['Date_by'];
-  $dayOfWeek = date('w', strtotime($date)); // 0 = Sunday, 1 = Monday,..., 6 = Saturday
-  $redenkovData[$dayOfWeek] += $row['count']; // суммируем количество заявок для каждого дня недели
-}
-
-?>
-
-
-<html>
-  <head>
-    <title>Графики заявок</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  </head>
-  <body>
-    <h1>Графики заявок</h1>
-    <div style="display: flex; flex-wrap: wrap; justify-content: space-between;">
-      <div style="width: 45%;">
-        <h2>Новые заявки</h2>
-        <canvas id="new-chart"></canvas>
-      </div>
-      <div style="width: 45%;">
-        <h2>Заявки в работе</h2>
-        <canvas id="in-work-chart"></canvas>
-      </div>
-      <div style="width: 45%;">
-        <h2>Приостановленные заявки</h2>
-        <canvas id="paused-chart"></canvas>
-      </div>
-      <div style="width: 45%;">
-        <h2>Завершенные заявки</h2>
-        <canvas id="completed-chart"></canvas>
-      </div>
-      <div style="width: 45%;">
-        <h2>Заявки со специалистом Реденков Никита Олегович</h2>
-        <canvas id="redenkov-chart"></canvas>
-      </div>
-    </div>
-    <script>
-      const ctxNew = document.getElementById('new-chart').getContext('2d');
-const chartNew = new Chart(ctxNew, {
-  type: 'line',
-  data: {
-    labels: <?= json_encode($daysOfWeek)?>,
-    datasets: [{
-      label: 'Количество заявок',
-      data: <?= json_encode($newData)?>,
-      backgroundColor: 'rgba(255, 255, 255, 0.2)',
-      borderColor: 'rgba(255, 255, 255, 1)',
-      borderWidth: 1
-    }]
-  },
-  options: {
-    scales: {
-      y: {
-        beginAtZero: true
-      }
-    },
-    plugins: {
-      legend: {
-        display: false
-      }
-    }
-  }
-});
-
-      const ctxInWork = document.getElementById('in-work-chart').getContext('2d');
-      const chartInWork = new Chart(ctxInWork, {
-        type: 'line',
-        data: {
-          labels: <?= json_encode(array_column($inWorkData, 'date'))?>,
-          datasets: [{
-            label: 'Количество заявок',
-            data: <?= json_encode(array_column($inWorkData, 'count'))?>,
-            backgroundColor: 'rgba(255, 255, 255, 0.2)',
-            borderColor: 'rgba(255, 255, 255, 1)',
-            borderWidth: 1
-          }]
-        },
-        options: {
-          scales: {
-            y: {
-              beginAtZero: true
-            }
-          },
-          plugins: {
-            legend: {
-              display: false
-            }
-          }
-        }
-      });
-      const ctxPaused = document.getElementById('paused-chart').getContext('2d');
-      const chartPaused = new Chart(ctxPaused, {
-        type: 'line',
-        data: {
-          labels: <?= json_encode(array_column($pausedData, 'date'))?>,
-          datasets: [{
-            label: 'Количество заявок',
-            data: <?= json_encode(array_column($pausedData, 'count'))?>,
-            backgroundColor: 'rgba(255, 255, 255, 0.2)',
-            borderColor: 'rgba(255, 255, 255, 1)',
-            borderWidth: 1
-          }]
-        },
-        options: {
-          scales: {
-            y: {
-              beginAtZero: true
-            }
-          },
-          plugins: {
-            legend: {
-              display: false
-            }
-          }
-        }
-      }); 
-
-      const ctxCompleted = document.getElementById('completed-chart').getContext('2d');
-      const chartCompleted = new Chart(ctxCompleted, {
-        type: 'line',
-        data: {
-          labels: <?= json_encode(array_column($completedData, 'date'))?>,
-          datasets: [{
-            label: 'Количество заявок',
-            data: <?= json_encode(array_column($completedData, 'count'))?>,
-            backgroundColor: 'rgba(255, 255, 255, 0.2)',
-            borderColor: 'rgba(255, 255, 255, 1)',
-            borderWidth: 1
-          }]
-        },
-        options: {
-          scales: {
-            y: {
-              beginAtZero: true
-            }
-          },
-          plugins: {
-            legend: {
-              display: false
-            }
-          }
-        }
-      }); 
-
-      const ctxRedenkov = document.getElementById('redenkov-chart').getContext('2d');
-      const chartRedenkov = new Chart(ctxRedenkov, {
-        type: 'line',
-        data: {
-          labels: <?= json_encode(array_column($redenkovData, 'date'))?>,
-          datasets: [{
-            label: 'Количество заявок',
-            data: <?= json_encode(array_column($redenkovData, 'count'))?>,
-            backgroundColor: 'rgba(255, 255, 255, 0.2)',
-            borderColor: 'rgba(255, 255, 255, 1)',
-            borderWidth: 1
-          }]
-        },
-        options: {
-          scales: {
-            y: {
-              beginAtZero: true
-            }
-          },
-          plugins: {
-            legend: {
-              display: false
-            }
-          }
-        }
-      }); 
-    </script>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
     <style>
-      body {
-        color: white;
-        background-color: #000;
-      }
-      canvas {
-        background-color: #000;
+     #notes-block {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* 3 columns */
+  grid-gap: 10px;
+}
+
+.note {
+  background-color: #f0f0f0;
+  padding: 10px;
+  border: 1px solid #ccc;
+  margin-bottom: 10px;
+}
+      #modal-create-note {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: #fff;
+        padding: 20px;
+        border: 1px solid #ccc;
+        display: none;
       }
     </style>
-  </body>
+</head>
+<body>
+<button id="create-note-btn">Создать заметку</button>
+
+<!-- Модальное окно для создания заметки -->
+<div id="modal-create-note">
+  <form id="create-note-form">
+    <label for="title">Заголовок:</label>
+    <input type="text" id="title" name="title"><br><br>
+    <label for="text">Текст:</label>
+    <textarea id="text" name="text"></textarea><br><br>
+    <button id="save-note-btn">Сохранить</button>
+  </form>
+</div>
+
+<!-- Блок для отображения заметок -->
+<div id="notes-block"></div>
+
+<script>
+     fetch('load_notes.php')
+   .then(response => response.json())
+   .then(data => {
+        var notesHtml = '';
+        data.notes.forEach(function(note) {
+            notesHtml += note;
+        });
+        document.getElementById('notes-block').innerHTML = notesHtml;
+    });
+    document.getElementById('create-note-btn').addEventListener('click', function() {
+      document.getElementById('modal-create-note').style.display = 'block';
+    });
+
+    document.getElementById('save-note-btn').addEventListener('click', function(event) {
+      event.preventDefault(); // добавляем это
+      var formData = new FormData(document.getElementById('create-note-form'));
+      fetch('create_note.php', {
+        method: 'POST',
+        body: formData
+      })
+    .then(response => response.json())
+    .then(data => {
+        document.getElementById('modal-create-note').style.display = 'none';
+        document.getElementById('notes-block').innerHTML += data.note;
+      });
+    });
+</script>
+</body>
 </html>

@@ -167,7 +167,7 @@ if (isset($_SESSION["id"])) {
             <option value="20">Каждые 20 секунд</option>
             <option value="60">Каждую 1 минуту</option>
         </select>
-        <button id="add-button" "><a href="NewOrder.php">Добавить</a></button>
+        <button id="add-button" "><a href=" NewOrder.php">Добавить</a></button>
     </div>
     <div class="user-info">
         <p> <?php echo $user_data['username']; ?></p>
@@ -264,18 +264,18 @@ if (isset($_SESSION["id"])) {
             // Создание таблицы
             echo "<table border='0' id='actives-table'  ";
             echo "<thead>
-          <tr id='head'>
-            <th>ID</th>
-            <th>Имя</th>
-            <th>Тип</th>
-            <th>Модель</th>
-            <th>Серийный номер</th>
-            <th>Дата покупки</th>
-            <th>Местоположение</th>
-            <th>Статус</th>
-            <th>Примечания</th>
-          </tr>
-        </thead>";
+                    <tr id='head'>
+                        <th>ID</th>
+                        <th>Имя</th>
+                        <th>Тип</th>
+                        <th>Модель</th>
+                        <th>Серийный номер</th>
+                        <th>Дата покупки</th>
+                        <th>Местоположение</th>
+                        <th>Статус</th>
+                        <th>Примечания</th>
+                    </tr>
+                    </thead>";
 
             // Вывод данных из таблицы
             while ($row = mysqli_fetch_assoc($result)) {
@@ -479,26 +479,26 @@ if (isset($_SESSION["id"])) {
 
 
                 function updateCharts() {
-    // Отправляем запрос на сервер для получения новых данных
-    fetch('get_new_data.php')
-       .then(response => response.json())
-       .then(data => {
-            // Обновляем данные графиков
-            chartNew.data.datasets[0].data = data.newData;
-            chartInWork.data.datasets[0].data = data.inWorkData;
-            chartPaused.data.datasets[0].data = data.pausedData;
-            chartCompleted.data.datasets[0].data = data.completedData;
+                    // Отправляем запрос на сервер для получения новых данных
+                    fetch('get_new_data.php')
+                        .then(response => response.json())
+                        .then(data => {
+                            // Обновляем данные графиков
+                            chartNew.data.datasets[0].data = data.newData;
+                            chartInWork.data.datasets[0].data = data.inWorkData;
+                            chartPaused.data.datasets[0].data = data.pausedData;
+                            chartCompleted.data.datasets[0].data = data.completedData;
 
-            // Обновляем графики
-            chartNew.update();
-            chartInWork.update();
-            chartPaused.update();
-            chartCompleted.update();
-        });
-}
+                            // Обновляем графики
+                            chartNew.update();
+                            chartInWork.update();
+                            chartPaused.update();
+                            chartCompleted.update();
+                        });
+                }
 
-// Вызываем функцию updateCharts каждые 10 секунд
-setInterval(updateCharts, 10000);
+                // Вызываем функцию updateCharts каждые 10 секунд
+                setInterval(updateCharts, 10000);
 
                 //...
 
@@ -506,6 +506,108 @@ setInterval(updateCharts, 10000);
 
             </script>
         </div>
+
+        <div class="notes">
+            <button id="create-note-btn">Создать заметку</button>
+            <!-- Модальное окно для создания заметки -->
+            <div id="modal-create-note">
+                <form id="create-note-form">
+                    <label for="title">Заголовок:</label>
+                    <input type="text" id="title" name="title"><br><br>
+                    <label for="text">Текст:</label>
+                    <textarea id="text" name="text"></textarea><br><br>
+                    <button id="save-note-btn">Сохранить</button>
+                </form>
+            </div>
+
+            <!-- Блок для отображения заметок -->
+            <div id="notes-block">
+
+                <?php
+                $current_user_id = $_SESSION["id"];
+                // Получаем все заметки, созданные текущим пользователем
+                $query = "SELECT * FROM zametki WHERE user_id =?";
+                $stmt = $conn->prepare($query);
+                $stmt->bind_param("i", $current_user_id);
+                $stmt->execute();
+                $result = $stmt->get_result();
+
+                while ($row = mysqli_fetch_assoc($result)) {
+                    echo '<div class="note">
+                  <button class="delete-note-btn" data-note-id="' . $row['id'] . '">✕</button>
+                  <button class="delete-block-btn" data-block-id="' . $row['id'] . '">Удалить блок</button>
+                  <h2>' . $row['Title'] . '</h2>
+                  <p>' . $row['Text'] . '</p>
+              </div>';
+                }
+                ?>
+            </div>
+
+            <script>
+                document.getElementById('create-note-btn').addEventListener('click', function () {
+                    document.getElementById('modal-create-note').style.display = 'block';
+                });
+                document.addEventListener('click', function (event) {
+                    if (event.target.classList.contains('delete-note-btn')) {
+                        var noteId = event.target.getAttribute('data-note-id');
+                        fetch('delete_note.php', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded'
+                            },
+                            body: 'id=' + noteId
+                        })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    event.target.parentNode.remove();
+                                } else {
+                                    alert('Ошибка удаления заметки');
+                                }
+                            });
+                    }
+                    if (event.target.classList.contains('delete-block-btn')) {
+                        var blockId = event.target.getAttribute('data-block-id');
+                        fetch('delete_block.php', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded'
+                            },
+                            body: 'id=' + blockId
+                        })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    event.target.parentNode.parentNode.remove();
+                                } else {
+                                    alert('Ошибка удаления блока');
+                                }
+                            });
+                    }
+                });
+                document.getElementById('save-note-btn').addEventListener('click', function (event) {
+                    event.preventDefault();
+                    var formData = new FormData(document.getElementById('create-note-form'));
+                    formData.append('user_id', '<?php echo $_SESSION["id"]; ?>'); // добавляем ID пользователя к форме
+                    fetch('create_note.php', {
+                        method: 'POST',
+                        body: formData
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            document.getElementById('modal-create-note').style.display = 'none';
+                            var noteHTML = '<div class="note">' +
+                                '<button class="delete-note-btn" data-note-id="' + data.id + '">✕</button>' +
+                                '<button class="delete-block-btn" data-block-id="' + data.id + '">Удалить блок</button>' +
+                                '<h2>' + data.title + '</h2>' +
+                                '<p>' + data.text + '</p>' +
+                                '</div>';
+                            document.getElementById('notes-block').innerHTML += noteHTML;
+                        });
+                });
+            </script>
+        </div>
+
 
 
     </div>

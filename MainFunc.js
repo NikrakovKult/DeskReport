@@ -78,21 +78,25 @@ function showActivesTable() {
     document.getElementById("orders-table").style.display = "none";
     document.getElementById("actives-table").style.display = "table";
     document.getElementsByClassName("graph")[0].style.display = "none";
+    document.getElementsByClassName("notes")[0].style.display = "notes";
 }
 function showOrdersTable() {
     document.getElementById("orders-table").style.display = "table";
     document.getElementById("actives-table").style.display = "none";
     document.getElementsByClassName("graph")[0].style.display = "none";
+    document.getElementsByClassName("notes")[0].style.display = "none";
 }
 function showGraph() {
     document.getElementById("orders-table").style.display = "none";
     document.getElementById("actives-table").style.display = "none";
     document.getElementsByClassName("graph")[0].style.display = "flex";
+    document.getElementsByClassName("notes")[0].style.display = "none";
 }
 function showZametki() {
     document.getElementById("orders-table").style.display = "none";
     document.getElementById("actives-table").style.display = "none";
     document.getElementsByClassName("graph")[0].style.display = "none";
+    document.getElementsByClassName("notes")[0].style.display = "block";
 }
 
 $(document).ready(function() {
@@ -139,5 +143,3 @@ $(document).ready(function() {
 });
 
  
-
-
