@@ -499,12 +499,9 @@ if (isset($_SESSION["id"])) {
 
                 // Вызываем функцию updateCharts каждые 10 секунд
                 setInterval(updateCharts, 10000);
-
-                //...
-
-                // Обновляем графики
-
+ 
             </script>
+
         </div>
 
         <div class="notes">

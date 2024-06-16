@@ -7,7 +7,7 @@ require_once ('connect.php');
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Активность Детали</title>
+    <title>Актив</title>
     <link rel="stylesheet" href="Styles/active_details.css">
 </head>
 
@@ -104,7 +104,7 @@ require_once ('connect.php');
         $query = "UPDATE actives SET Name = '$Name', Type = '$Type', Model = '$Model', Serial_number = '$Serial_number', Purchase_date = '$Purchase_date', Location = '$Location', Status = '$Status', Notes = '$Notes' WHERE id = '$id'";
 
         if (mysqli_query($conn, $query)) {
-            echo "Активность обновлена успешно";
+            echo "Добавлено";
             header("Location: Main.php");
             exit;
         } else {

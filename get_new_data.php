@@ -6,7 +6,7 @@ $conn = mysqli_connect("localhost", "root", "", "DeskReport");
 $monday = date('Y-m-d', strtotime('monday this week'));
 $sunday = date('Y-m-d', strtotime('sunday this week'));
 
-$daysOfWeek = ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'];
+$daysOfWeek = ['Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота', 'Воскресенье'];
 $newData = array_fill(0, 7, 0);
 $inWorkData = array_fill(0, 7, 0);
 $pausedData = array_fill(0, 7, 0);
