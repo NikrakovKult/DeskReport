@@ -6,7 +6,7 @@ $conn = mysqli_connect("localhost", "root", "", "DeskReport");
 $monday = date('Y-m-d', strtotime('monday this week'));
 $sunday = date('Y-m-d', strtotime('sunday this week'));
 
-$daysOfWeek = ['Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота', 'Воскресенье'];
+$daysOfWeek = ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота' ];
 $newData = array_fill(0, 7, 0);
 $inWorkData = array_fill(0, 7, 0);
 $pausedData = array_fill(0, 7, 0);
@@ -44,6 +44,24 @@ while ($row = mysqli_fetch_assoc($result)) {
     $dayOfWeek = date('w', strtotime($date)); // 0 = Sunday, 1 = Monday,..., 6 = Saturday
     $completedData[$dayOfWeek] += $row['count']; // суммируем количество заявок для каждого дня недели
 }
+$firstDayOfYear = date('Y-01-01');
+$lastDayOfYear = date('Y-12-31');
+
+$dataYear = array_fill(0, 12, 0);
+
+$monthsOfYear = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'];
+$newDataYear = array_fill(0, 12, 0);
+$inWorkDataYear = array_fill(0, 12, 0);
+$pausedDataYear = array_fill(0, 12, 0);
+$completedDataYear = array_fill(0, 12, 0);
+
+$query = "SELECT MONTH(Date_by) as month, COUNT(*) as count FROM orders WHERE Date_by BETWEEN '$firstDayOfYear' AND '$lastDayOfYear' GROUP BY month";
+$result = mysqli_query($conn, $query);
+while ($row = mysqli_fetch_assoc($result)) {
+    $month = $row['month'];
+    $dataYear[$month - 1] += $row['count'];
+}
+
 
 // Возвращаем новые данные в формате JSON
 echo json_encode(
@@ -51,7 +69,16 @@ echo json_encode(
         'newData' => $newData,
         'inWorkData' => $inWorkData,
         'pausedData' => $pausedData,
-        'completedData' => $completedData
+        'completedData' => $completedData,
+        'newDataYear' => $newDataYear,
+        'inWorkDataYear' => $inWorkDataYear,
+        'pausedDataYear' => $pausedDataYear,
+        'completedDataYear' => $completedDataYear,
+        'newDataMonth' => $newDataMonth,
+        'dataYear' => $dataYear
+        
+
     )
 );
+
 ?>

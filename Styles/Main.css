@@ -21,13 +21,15 @@ grid-row-gap: 0px;
 
 .nav-sidebar {
   display: flex;
-  justify-content: flex-end;
-  grid-area: 1 / 2 / 2 / 3;
-  align-content: flex-start;
-  flex-wrap: wrap;
+    justify-content: center;
+    grid-area: 1 / 2 / 2 / 3;
+    align-content: center;
+    flex-wrap: wrap;
+    align-items: center;
 }
 
 .nav {
+  height: 105px;
   display: inline-flex;
   position: relative;
   max-width: 100%;
@@ -77,6 +79,7 @@ grid-row-gap: 0px;
   color: #71eeff8e;
 }
 #close-modal-btn {
+  margin: -10px;
   margin-bottom: 5px;
   position: absolute;
   top: 10px;
@@ -89,6 +92,7 @@ grid-row-gap: 0px;
 }
 
 #close-modal-btn:hover {
+  margin: -10px;
   margin-bottom: 5px;
   border: 1px solid white;
   color: rgb(0, 0, 0);
@@ -96,7 +100,25 @@ grid-row-gap: 0px;
   background: red;
   transition: 0.3s;
 }
-
+ #title{ 
+  text-transform: uppercase;
+  padding: 5px;
+    border-radius: 15px;
+    background: #0000005c;
+    border: 1px solid white;
+}
+.note h2{
+  text-transform: uppercase;
+}
+ #text{
+  border-radius: 15px;
+    height: 100px;
+    width: 300px;
+    background: #0000005c;
+    border: 1px solid white;
+    max-width: 300px;
+    max-height: 100px;
+}
 .modal-header {
   position: relative;
   padding: 10px;
@@ -279,7 +301,12 @@ th {
   background-color: #0000004d;
 }
 
-
+#users-table{
+  display: none;
+}
+#clients-table{
+  display: none;
+}
 .filter-block {
   display: flex;
   grid-area: 2 / 1 / 3 / 4;
@@ -289,22 +316,7 @@ th {
   background-color: #f0f0f0;
   border-bottom: 1px solid #ccc;
 }
-#actives-table thead{
-  background: black;
-    color: rgb(255, 255, 255);
-    background-color: rgb(255, 255, 255);
-    backdrop-filter: blur(5px);
-    display: flex;
-    text-align: center;
-    margin: 10px;
-    border-radius: 30px;
-    padding: 10px;
-    flex-direction: row;
-    flex-wrap: nowrap;
-    align-content: space-around;
-    justify-content: space-around;
-    align-items: center;
-}
+
 
 
 .filter-select {
@@ -368,9 +380,12 @@ th {
   font-size: 16px; /* размер текста погоды */
 }
 .graph{
-  display: none; 
-  flex-wrap: wrap; 
-  justify-content: space-between;
+  display: none;
+    align-content: center;
+    flex-wrap: wrap;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
 }
 #new-chart{
  
@@ -392,6 +407,15 @@ th {
   background: rgba(0, 0, 0, 0.52);
   border-radius: 15px;
 }
+#year-chart{
+  background: rgba(0, 0, 0, 0.52);
+    border-radius: 15px;
+}
+#month-chart{
+  background: rgba(0, 0, 0, 0.52);
+    border-radius: 15px;
+}
+
 .new-status {
   background-color: #919191; /* желтый */
 }

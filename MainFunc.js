@@ -78,25 +78,49 @@ function showActivesTable() {
     document.getElementById("orders-table").style.display = "none";
     document.getElementById("actives-table").style.display = "table";
     document.getElementsByClassName("graph")[0].style.display = "none";
-    document.getElementsByClassName("notes")[0].style.display = "notes";
+    document.getElementsByClassName("notes")[0].style.display = "none";
+    document.getElementById("users-table").style.display = "none";
+    document.getElementById("clients-table").style.display = "none";
 }
 function showOrdersTable() {
     document.getElementById("orders-table").style.display = "table";
     document.getElementById("actives-table").style.display = "none";
     document.getElementsByClassName("graph")[0].style.display = "none";
     document.getElementsByClassName("notes")[0].style.display = "none";
+    document.getElementById("users-table").style.display = "none";
+    document.getElementById("clients-table").style.display = "none";
 }
 function showGraph() {
     document.getElementById("orders-table").style.display = "none";
     document.getElementById("actives-table").style.display = "none";
     document.getElementsByClassName("graph")[0].style.display = "flex";
     document.getElementsByClassName("notes")[0].style.display = "none";
+    document.getElementById("users-table").style.display = "none";
+    document.getElementById("clients-table").style.display = "none";
 }
 function showZametki() {
     document.getElementById("orders-table").style.display = "none";
     document.getElementById("actives-table").style.display = "none";
     document.getElementsByClassName("graph")[0].style.display = "none";
     document.getElementsByClassName("notes")[0].style.display = "block";
+    document.getElementById("users-table").style.display = "none";
+    document.getElementById("clients-table").style.display = "none";
+}
+function showUsers() {
+    document.getElementById("orders-table").style.display = "none";
+    document.getElementById("actives-table").style.display = "none";
+    document.getElementById("users-table").style.display = "table";
+    document.getElementById("clients-table").style.display = "none";
+    document.getElementsByClassName("graph")[0].style.display = "none";
+    document.getElementsByClassName("notes")[0].style.display = "none";
+}
+function showClients() {
+    document.getElementById("orders-table").style.display = "none";
+    document.getElementById("actives-table").style.display = "none";
+    document.getElementById("users-table").style.display = "none";
+    document.getElementById("clients-table").style.display = "table";
+    document.getElementsByClassName("graph")[0].style.display = "none";
+    document.getElementsByClassName("notes")[0].style.display = "none";
 }
 
 $(document).ready(function() {

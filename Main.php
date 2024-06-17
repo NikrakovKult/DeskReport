@@ -132,18 +132,28 @@ if (isset($_SESSION["id"])) {
     </script>
     <div class="nav-sidebar">
         <nav class="nav">
-            <a href="#" class="nav-item" active-color="blue" onclick="showOrdersTable()">Заявки</a>
+            <a href="#" class="nav-item" active-color="blue" onclick="showOrdersTable()">
+                <i class="fa fa-bars"></i></i> Заявки
+            </a>
 
-            <a href="#" class="nav-item" active-color="blue" onclick="showActivesTable()">Активы</a>
-            <a href="#" class="nav-item" active-color="blue"><i class='fa fa-address-book'></i>Адресная книга
-                Сотрудники</a>
-            <a href="#" class="nav-item" active-color="blue"><i class='fa fa-address-card'></i>Адресная книга
-                клиенты</a>
-            <a href="#" class="nav-item" active-color="blue" onclick="showZametki()"><i
-                    class='fa fa-sticky-note'></i>Заметки</a>
-            <a href="#" class="nav-item" active-color="blue"><i class='fa fa-tasks'></i>Задачи</a>
-            <a href="#" class="nav-item" active-color="blue" onclick="showGraph()"><i
-                    class="fa fa-bar-chart"></i>Анализ</a>
+            <a href="#" class="nav-item" active-color="blue" onclick="showActivesTable()">
+                <i class='fa fa-briefcase'></i> Активы
+            </a>
+            <a href="#" class="nav-item" active-color="blue" onclick="showUsers()">
+                <i class='fa fa-users'></i> Сотрудники
+            </a>
+            <a href="#" class="nav-item" active-color="blue" onclick="showClients()">
+                <i class='fa fa-user'></i> Клиенты
+            </a>
+            <a href="#" class="nav-item" active-color="blue" onclick="showZametki()">
+                <i class='fa fa-sticky-note'></i> Заметки
+            </a>
+            <a href="#" class="nav-item" active-color="blue">
+                <i class='fa fa-check-square'></i> Задачи
+            </a>
+            <a href="#" class="nav-item" active-color="blue" onclick="showGraph()">
+                <i class="fa fa-chart-line"></i> Анализ
+            </a>
             <span class="nav-indicator"></span>
         </nav>
     </div>
@@ -262,18 +272,15 @@ if (isset($_SESSION["id"])) {
             $result = $stmt->get_result();
 
             // Создание таблицы
-            echo "<table border='0' id='actives-table'  ";
+            echo "<table border='0' id='actives-table'>";
             echo "<thead>
                     <tr id='head'>
                         <th>ID</th>
-                        <th>Имя</th>
+                        <th>Название</th>
                         <th>Тип</th>
                         <th>Модель</th>
                         <th>Серийный номер</th>
-                        <th>Дата покупки</th>
-                        <th>Местоположение</th>
-                        <th>Статус</th>
-                        <th>Примечания</th>
+                        
                     </tr>
                     </thead>";
 
@@ -285,10 +292,77 @@ if (isset($_SESSION["id"])) {
                 echo "<td><a href='active_details.php?id=" . $row['id'] . "'>" . $row['type'] . "</a></td>";
                 echo "<td><a href='active_details.php?id=" . $row['id'] . "'>" . $row['model'] . "</a></td>";
                 echo "<td><a href='active_details.php?id=" . $row['id'] . "'>" . $row['serial_number'] . "</a></td>";
-                echo "<td><a href='active_details.php?id=" . $row['id'] . "'>" . $row['purchase_date'] . "</a></td>";
-                echo "<td><a href='active_details.php?id=" . $row['id'] . "'>" . $row['location'] . "</a></td>";
-                echo "<td><a href='active_details.php?id=" . $row['id'] . "'>" . $row['status'] . "</a></td>";
-                echo "<td><a href='active_details.php?id=" . $row['id'] . "'>" . $row['notes'] . "</a></td>";
+                echo "</tr>";
+            }
+
+            echo "</table>";
+        }
+        ?>
+        <?php
+        if (isset($_SESSION['id'])) {
+            $sql = "SELECT * FROM clients";
+            $stmt = $conn->prepare($sql);
+            $stmt->execute();
+            $result = $stmt->get_result();
+
+            // Создание таблицы
+            echo "<table border='0' id='clients-table'>";
+            echo "<thead>
+                    <tr id='head'>
+                        <th>ID</th>
+                        <th>ФИО</th>
+                        <th>Email</th>
+                        <th>Мобильный</th>
+                        <th>Отдел</th>
+                        <th>Должность</th>
+                    </tr>
+                    </thead>";
+
+            // Вывод данных из таблицы
+            while ($row = mysqli_fetch_assoc($result)) {
+                echo "<tr>";
+                echo "<td><a href='client_details.php?id=" . $row['id'] . "'>" . $row['id'] . "</a></td>";
+                echo "<td><a href='client_details.php?id=" . $row['id'] . "'>" . $row['fio'] . "</a></td>";
+                echo "<td><a href='client_details.php?id=" . $row['id'] . "'>" . $row['email'] . "</a></td>";
+                echo "<td><a href='client_details.php?id=" . $row['id'] . "'>" . $row['mobile'] . "</a></td>";
+                echo "<td><a href='client_details.php?id=" . $row['id'] . "'>" . $row['otdel'] . "</a></td>";
+                echo "<td><a href='client_details.php?id=" . $row['id'] . "'>" . $row['doljnost'] . "</a></td>";
+                echo "</tr>";
+            }
+
+            echo "</table>";
+        }
+        ?>
+
+        <?php
+        if (isset($_SESSION['id'])) {
+            $sql = "SELECT * FROM users";
+            $stmt = $conn->prepare($sql);
+            $stmt->execute();
+            $result = $stmt->get_result();
+
+            // Создание таблицы
+            echo "<table border='0' id='users-table'>";
+            echo "<thead>
+            <tr id='head'>
+                <th>ID</th>
+                <th>Имя пользователя</th>
+                <th>Email</th>
+                <th>Должность</th>
+                <th>Отдел</th>
+                <th>Мобильный телефон</th>
+            </tr>
+          </thead>";
+
+            // Вывод данных из таблицы
+            while ($row = mysqli_fetch_assoc($result)) {
+                echo "<tr>";
+                echo "<td><a href='user_details.php?id=" . $row['id'] . "'>" . $row['id'] . "</a></td>";
+                echo "<td><a href='user_details.php?id=" . $row['id'] . "'>" . $row['username'] . "</a></td>";
+                echo "<td><a href='user_details.php?id=" . $row['id'] . "'>" . $row['email'] . "</a></td>";
+                echo "<td><a href='user_details.php?id=" . $row['id'] . "'>" . $row['Doljnost'] . "</a></td>";
+                echo "<td><a href='user_details.php?id=" . $row['id'] . "'>" . $row['Otdel'] . "</a></td>";
+                echo "<td><a href='user_details.php?id=" . $row['id'] . "'>" . $row['Mobile'] . "</a></td>";
                 echo "</tr>";
             }
 
@@ -314,10 +388,22 @@ if (isset($_SESSION["id"])) {
                 <canvas id="completed-chart"></canvas>
             </div>
 
+            <div style="width: 20%; color:white; margin:10px;">
+                <h2>Заявки за год</h2>
+                <canvas id="year-chart"></canvas>
+            </div>
+            <div style="width: 20%; color:white; margin:10px;">
+                <h2>Заявки за месяц</h2>
+                <canvas id="month-chart"></canvas>
+            </div>
+
+
+
             <?PHP
 
-            $monday = date('Y-m-d', strtotime('monday this week'));
-            $sunday = date('Y-m-d', strtotime('sunday this week'));
+            $today = date('Y-m-d');
+            $monday = date('Y-m-d', strtotime('monday this week', strtotime($today)));
+            $sunday = date('Y-m-d', strtotime('sunday this week', strtotime($today)));
 
             $daysOfWeek = ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'];
             $newData = array_fill(0, 7, 0);
@@ -364,11 +450,49 @@ if (isset($_SESSION["id"])) {
                 'completedData' => $completedData,
 
             );
+            $firstDayOfYear = date('Y-01-01');
+            $lastDayOfYear = date('Y-12-31');
+
+            $monthsOfYear = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'];
+            $newDataYear = array_fill(0, 12, 0);
+            $inWorkDataYear = array_fill(0, 12, 0);
+            $pausedDataYear = array_fill(0, 12, 0);
+            $completedDataYear = array_fill(0, 12, 0);
+
+            $query = "SELECT MONTH(Date_by) as month, COUNT(*) as count FROM orders WHERE Date_by BETWEEN '$firstDayOfYear' AND '$lastDayOfYear' GROUP BY month";
+            $result = mysqli_query($conn, $query);
+            while ($row = mysqli_fetch_assoc($result)) {
+                $month = $row['month'];
+                $newDataYear[$month - 1] += $row['count']; // суммируем количество заявок для каждого месяца
+            }
+
+            // Возвращаем новые данные в формате JSON
+            $firstDayOfMonth = date('Y-m-01');
+            $lastDayOfMonth = date('Y-m-t');
+
+            $daysOfMonth = cal_days_in_month(CAL_GREGORIAN, date('m'), date('Y'));
+            $newDataMonth = array_fill(0, $daysOfMonth, 0);
+
+            $query = "SELECT DATE_FORMAT(Date_by, '%d') as day, COUNT(*) as count FROM orders WHERE Date_by BETWEEN '$firstDayOfMonth' AND '$lastDayOfMonth' GROUP BY day";
+            $result = mysqli_query($conn, $query);
+            while ($row = mysqli_fetch_assoc($result)) {
+                $day = $row['day'];
+                $newDataMonth[$day - 1] += $row['count']; // суммируем количество заявок для каждого дня месяца
+            }
+
+
+
 
 
             ?>
 
             <script>
+                function getStartAndEndOfWeek() {
+                    return [
+                        date('Y-m-d', strtotime('monday this week')),
+                        date('Y-m-d', strtotime('sunday this week'))
+                    ];
+                }
                 const ctxNew = document.getElementById('new-chart').getContext('2d');
                 const chartNew = new Chart(ctxNew, {
                     type: 'line',
@@ -475,6 +599,33 @@ if (isset($_SESSION["id"])) {
                     }
                 });
 
+                const ctxYear = document.getElementById('year-chart').getContext('2d');
+                const chartYear = new Chart(ctxYear, {
+                    type: 'line',
+                    data: {
+                        labels: <?= json_encode($monthsOfYear) ?>,
+                        datasets: [{
+                            label: 'Количество заявок',
+                            data: <?= json_encode($newDataYear) ?>,
+                            backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                            borderColor: 'rgba(255, 255, 255, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        }
+                    }
+                });
+
 
 
 
@@ -495,119 +646,155 @@ if (isset($_SESSION["id"])) {
                             chartPaused.update();
                             chartCompleted.update();
                         });
+
                 }
+                const ctxMonth = document.getElementById('month-chart').getContext('2d');
+                const chartMonth = new Chart(ctxMonth, {
+                    type: 'line',
+                    data: {
+                        labels: <?= json_encode(array_keys($newDataMonth)) ?>,
+                        datasets: [{
+                            label: 'Количество заявок',
+                            data: <?= json_encode(array_values($newDataMonth)) ?>,
+                            backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                            borderColor: 'rgba(255, 255, 255, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        }
+                    }
+                });
 
                 // Вызываем функцию updateCharts каждые 10 секунд
                 setInterval(updateCharts, 10000);
- 
+
+                // Вызываем функцию updateCharts в начале каждой недели
+                const startOfWeek = new Date();
+                startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay());
+                setInterval(() => {
+                    const now = new Date();
+                    if (now.getDay() === startOfWeek.getDay()) {
+                        updateCharts();
+                    }
+                }, 1000);
             </script>
 
         </div>
 
         <div class="notes">
-  <button id="create-note-btn">Создать заметку</button>
-  <!-- Модальное окно для создания заметки -->
-  <div id="modal-create-note">
-    <form id="create-note-form">
-      <label for="title">Заголовок:</label>
-      <input type="text" id="title" name="title"><br><br>
-      <label for="text">Текст:</label>
-      <textarea id="text" name="text"></textarea><br><br>
-      <button id="save-note-btn">Сохранить</button>
-      <button id="close-modal-btn">✕</button>
-    </form>
-  </div>
+            <button id="create-note-btn">Создать заметку</button>
+            <!-- Модальное окно для создания заметки -->
+            <div id="modal-create-note">
+                <form id="create-note-form">
+                    <label for="title">Заголовок:</label>
+                    <input type="text" id="title" name="title"><br><br>
+                    <label for="text">Текст:</label>
+                    <textarea id="text" name="text"></textarea><br><br>
+                    <button id="save-note-btn">Сохранить</button>
+                    <button id="close-modal-btn">✕</button>
+                </form>
+            </div>
 
-  <!-- Блок для отображения заметок -->
-  <div id="notes-block">
+            <!-- Блок для отображения заметок -->
+            <div id="notes-block">
 
-    <?php
-    $current_user_id = $_SESSION["id"];
-    // Получаем все заметки, созданные текущим пользователем
-    $query = "SELECT * FROM zametki WHERE user_id =?";
-    $stmt = $conn->prepare($query);
-    $stmt->bind_param("i", $current_user_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
+                <?php
+                $current_user_id = $_SESSION["id"];
+                // Получаем все заметки, созданные текущим пользователем
+                $query = "SELECT * FROM zametki WHERE user_id =?";
+                $stmt = $conn->prepare($query);
+                $stmt->bind_param("i", $current_user_id);
+                $stmt->execute();
+                $result = $stmt->get_result();
 
-    while ($row = mysqli_fetch_assoc($result)) {
-      echo '<div class="note">
+                while ($row = mysqli_fetch_assoc($result)) {
+                    echo '<div class="note">
                   <button class="delete-note-btn" data-note-id="' . $row['id'] . '">✕</button>
                  
                   <h2>' . $row['Title'] . '</h2>
                   <p>' . $row['Text'] . '</p>
               </div>';
-    }
-    ?>
-  </div>
+                }
+                ?>
+            </div>
 
-  <script>
-    document.getElementById('create-note-btn').addEventListener('click', function () {
-      document.getElementById('modal-create-note').style.display = 'block';
-    });
-    document.getElementById('close-modal-btn').addEventListener('click', function () {
-      document.getElementById('modal-create-note').style.display = 'none';
-    });
-    document.addEventListener('click', function (event) {
-      if (event.target.classList.contains('delete-note-btn')) {
-        var noteId = event.target.getAttribute('data-note-id');
-        fetch('delete_note.php', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded'
-          },
-          body: 'id=' + noteId
-        })
-          .then(response => response.json())
-          .then(data => {
-            if (data.success) {
-              event.target.parentNode.remove();
-            } else {
-              alert('Ошибка удаления заметки');
-            }
-          });
-      }
-      if (event.target.classList.contains('delete-block-btn')) {
-        var blockId = event.target.getAttribute('data-block-id');
-        fetch('delete_block.php', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded'
-          },
-          body: 'id=' + blockId
-        })
-          .then(response => response.json())
-          .then(data => {
-            if (data.success) {
-              event.target.parentNode.parentNode.remove();
-            } else {
-              alert('Ошибка удаления блока');
-            }
-          });
-      }
-    });
-    document.getElementById('save-note-btn').addEventListener('click', function (event) {
-      event.preventDefault();
-      var formData = new FormData(document.getElementById('create-note-form'));
-      formData.append('user_id', '<?php echo $_SESSION["id"]; ?>'); // добавляем ID пользователя к форме
-      fetch('create_note.php', {
-        method: 'POST',
-        body: formData
-      })
-        .then(response => response.json())
-        .then(data => {
-          document.getElementById('modal-create-note').style.display = 'none';
-          var noteHTML = '<div class="note">' +
-            '<button class="delete-note-btn" data-note-id="' + data.id + '">✕</button>' +
-            
-            '<h2>' + data.title + '</h2>' +
-            '<p>' + data.text + '</p>' +
-            '</div>';
-          document.getElementById('notes-block').innerHTML += noteHTML;
-        });
-    });
-  </script>
-</div>
+            <script>
+                document.getElementById('create-note-btn').addEventListener('click', function () {
+                    document.getElementById('modal-create-note').style.display = 'block';
+                });
+                document.getElementById('close-modal-btn').addEventListener('click', function () {
+                    document.getElementById('modal-create-note').style.display = 'none';
+                });
+                document.addEventListener('click', function (event) {
+                    if (event.target.classList.contains('delete-note-btn')) {
+                        var noteId = event.target.getAttribute('data-note-id');
+                        fetch('delete_note.php', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded'
+                            },
+                            body: 'id=' + noteId
+                        })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    event.target.parentNode.remove();
+                                } else {
+                                    alert('Ошибка удаления заметки');
+                                }
+                            });
+                    }
+                    if (event.target.classList.contains('delete-block-btn')) {
+                        var blockId = event.target.getAttribute('data-block-id');
+                        fetch('delete_block.php', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded'
+                            },
+                            body: 'id=' + blockId
+                        })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    event.target.parentNode.parentNode.remove();
+                                } else {
+                                    alert('Ошибка удаления блока');
+                                }
+                            });
+                    }
+                });
+                document.getElementById('save-note-btn').addEventListener('click', function (event) {
+                    event.preventDefault();
+                    var formData = new FormData(document.getElementById('create-note-form'));
+                    formData.append('user_id', '<?php echo $_SESSION["id"]; ?>'); // добавляем ID пользователя к форме
+                    fetch('create_note.php', {
+                        method: 'POST',
+                        body: formData
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            document.getElementById('modal-create-note').style.display = 'none';
+                            var noteHTML = '<div class="note">' +
+                                '<button class="delete-note-btn" data-note-id="' + data.id + '">✕</button>' +
+
+                                '<h2>' + data.title + '</h2>' +
+                                '<p>' + data.text + '</p>' +
+                                '</div>';
+                            document.getElementById('notes-block').innerHTML += noteHTML;
+                        });
+                });
+            </script>
+        </div>
 
 
 

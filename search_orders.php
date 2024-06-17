@@ -37,7 +37,7 @@ if (isset($_POST['searchQuery']) && isset($_POST['status'])) {
     $searchQuery = $_POST['searchQuery'];
     $status = $_POST['status'];
     if ($status == 'Все заявки') {
-        $sql = "SELECT * FROM orders WHERE Discrip LIKE? OR Sender LIKE? OR Specialist LIKE?";
+        $sql = "SELECT * FROM orders WHERE Discrip LIKE? OR Sender LIKE? OR Specialist LIKE? ";
         $stmt = $conn->prepare($sql);
         $param1 = "%$searchQuery%";
         $param2 = "%$searchQuery%";

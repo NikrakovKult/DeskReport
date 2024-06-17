@@ -1,5 +1,5 @@
 <?php
-require_once('connect.php');
+require_once ('connect.php');
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -7,13 +7,29 @@ require_once('connect.php');
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Order Details</title>
+    <title>Подробности заявки</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link rel="stylesheet" href="Styles/order_details.css">
 </head>
 
 <body>
+
     <div class="info-container">
-        
+        <script>
+            document.addEventListener('click', function (event) {
+                if (event.target.matches('.fullscreen-image-link')) {
+                    event.preventDefault();
+                    const imageUrl = event.target.dataset.image;
+                    const fullscreenImage = document.getElementById('fullscreen-image');
+                    fullscreenImage.querySelector('img').src = imageUrl;
+                    fullscreenImage.style.display = 'flex';
+                }
+            });
+
+            document.getElementById('fullscreen-image').addEventListener('click', function () {
+                this.style.display = 'none';
+            });
+        </script>
         <form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post">
             <div class="Order">
                 <?php
@@ -80,20 +96,24 @@ require_once('connect.php');
 
                     echo "<div class='photos'>";
                     echo "<div class='form-group'>";
-
+                    echo "<a href='#' class='fullscreen-image-link' data-image='" . $row['Photo1'] . "'>";
                     echo "<img src='" . $row['Photo1'] . "' alt='Photo 1'>";
+                    echo "</a>";
                     echo "</div>";
 
                     echo "<div class='form-group'>";
-
+                    echo "<a href='#' class='fullscreen-image-link' data-image='" . $row['Photo2'] . "'>";
                     echo "<img src='" . $row['Photo2'] . "' alt='Photo 2'>";
+                    echo "</a>";
                     echo "</div>";
 
                     echo "<div class='form-group'>";
-
+                    echo "<a href='#' class='fullscreen-image-link' data-image='" . $row['Photo3'] . "'>";
                     echo "<img src='" . $row['Photo3'] . "' alt='Photo 3'>";
+                    echo "</a>";
                     echo "</div>";
                     echo "</div>";
+
 
                     $sender_username = $row['Sender'];
                     $result_sender = mysqli_query($conn, "SELECT * FROM clients WHERE fio = '$sender_username'");
@@ -180,7 +200,7 @@ require_once('connect.php');
         exit;
     }
     ?>
-    
+
 </body>
 
 </html>
