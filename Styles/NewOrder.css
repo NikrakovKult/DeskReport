@@ -151,14 +151,14 @@ label a {
 
 .upload-box {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 10px;
-  width: 200px;
-  height: 55px;
-  margin: 10px;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    width: 200px;
+    height: 100px;
+    margin: 10px;
 }
 
 .drag-drop-zone {
@@ -215,6 +215,7 @@ label a {
     width: 80%;
     margin: 20px auto;
     padding: 15px;
+    height: 1000px;
   }
 
   .container {
@@ -253,6 +254,7 @@ label a {
     width: 90%;
     margin: 10px auto;
     padding: 10px;
+    height: 1000px;
   }
 
   .container {
@@ -298,11 +300,13 @@ label a {
     width: 95%;
     margin: 5px auto;
     padding: 5px;
+    height: 1000px;
   }
 
   .container {
     flex-direction: column;
     padding: 5px;
+    
   }
 
   .container::before {
@@ -336,4 +340,42 @@ label a {
     height: 30px;
   }
 
+}
+.modal {
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Sit on top */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgb(0,0,0); /* Fallback color */
+  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+.modal-content {
+  background-color: #fefefe;
+  margin: 15% auto; /* 15% from the top and centered */
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%; /* Could be more or less, depending on screen size */
+}
+
+.close {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
+#photo button{
+  
+  height: 20px;
 }

@@ -79,7 +79,7 @@ function showActivesTable() {
     document.getElementById("actives-table").style.display = "table";
     document.getElementsByClassName("graph")[0].style.display = "none";
     document.getElementsByClassName("notes")[0].style.display = "none";
-    document.getElementById("users-table").style.display = "none";
+    document.getElementById("users-block").style.display = "none";
     document.getElementById("clients-table").style.display = "none";
 }
 function showOrdersTable() {
@@ -87,7 +87,7 @@ function showOrdersTable() {
     document.getElementById("actives-table").style.display = "none";
     document.getElementsByClassName("graph")[0].style.display = "none";
     document.getElementsByClassName("notes")[0].style.display = "none";
-    document.getElementById("users-table").style.display = "none";
+    document.getElementById("users-block").style.display = "none";
     document.getElementById("clients-table").style.display = "none";
 }
 function showGraph() {
@@ -95,7 +95,7 @@ function showGraph() {
     document.getElementById("actives-table").style.display = "none";
     document.getElementsByClassName("graph")[0].style.display = "flex";
     document.getElementsByClassName("notes")[0].style.display = "none";
-    document.getElementById("users-table").style.display = "none";
+    document.getElementById("users-block").style.display = "none";
     document.getElementById("clients-table").style.display = "none";
 }
 function showZametki() {
@@ -103,13 +103,13 @@ function showZametki() {
     document.getElementById("actives-table").style.display = "none";
     document.getElementsByClassName("graph")[0].style.display = "none";
     document.getElementsByClassName("notes")[0].style.display = "block";
-    document.getElementById("users-table").style.display = "none";
+    document.getElementById("users-block").style.display = "none";
     document.getElementById("clients-table").style.display = "none";
 }
 function showUsers() {
     document.getElementById("orders-table").style.display = "none";
     document.getElementById("actives-table").style.display = "none";
-    document.getElementById("users-table").style.display = "table";
+    document.getElementById("users-block").style.display = "flex";
     document.getElementById("clients-table").style.display = "none";
     document.getElementsByClassName("graph")[0].style.display = "none";
     document.getElementsByClassName("notes")[0].style.display = "none";
@@ -117,7 +117,7 @@ function showUsers() {
 function showClients() {
     document.getElementById("orders-table").style.display = "none";
     document.getElementById("actives-table").style.display = "none";
-    document.getElementById("users-table").style.display = "none";
+    document.getElementById("users-block").style.display = "none";
     document.getElementById("clients-table").style.display = "table";
     document.getElementsByClassName("graph")[0].style.display = "none";
     document.getElementsByClassName("notes")[0].style.display = "none";
@@ -166,3 +166,14 @@ $(document).ready(function() {
     }
 });
 
+function updateTable(specialist) {
+    $.ajax({
+        type: "POST",
+        url: "search_orders.php",
+        data: { specialist: specialist },
+        dataType: "html",
+        success: function(data) {
+            $(".main-table").html(data);
+        }
+    });
+}

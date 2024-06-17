@@ -5,6 +5,7 @@ require_once ('connect.php');
 <html lang="en">
 
 <head>
+<link type="image/png" sizes="16x16" rel="icon" href="/icons8-модуль-16.png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Подробности заявки</title>

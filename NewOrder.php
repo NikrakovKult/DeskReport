@@ -1,24 +1,24 @@
 <?php
-    // Подключение к базе данных
-    $conn = mysqli_connect("localhost", "root", "", "DeskReport");
+// Подключение к базе данных
+$conn = mysqli_connect("localhost", "root", "", "DeskReport");
 
-    // Проверка соединения
-    if (!$conn) {
-        die("Ошибка соединения: " . mysqli_connect_error());
-    }
+// Проверка соединения
+if (!$conn) {
+    die("Ошибка соединения: " . mysqli_connect_error());
+}
 
-    // Проверка отправки формы
-    if ($_SERVER["REQUEST_METHOD"] == "POST") {
-        // Обработка данных формы
-        $fio = $_POST['fio'];
-        $email = $_POST['email'];
-        $mobile = $_POST['mobile'];
-        $otdel = $_POST['otdel'];
-        $doljnost = $_POST['doljnost'];
-        $discrip = $_POST['discrip'];
+// Проверка отправки формы
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Обработка данных формы
+    $fio = $_POST['fio'];
+    $email = $_POST['email'];
+    $mobile = $_POST['mobile'];
+    $otdel = $_POST['otdel'];
+    $doljnost = $_POST['doljnost'];
+    $discrip = $_POST['discrip'];
 
-        // Вставка данных в базу данных
-        $query = "SELECT * FROM clients WHERE fio = '$fio' AND email = '$email' AND mobile = '$mobile' AND otdel = '$otdel' AND doljnost = '$doljnost'";
+    // Вставка данных в базу данных
+    $query = "SELECT * FROM clients WHERE fio = '$fio' AND email = '$email' AND mobile = '$mobile' AND otdel = '$otdel' AND doljnost = '$doljnost'";
     $result = mysqli_query($conn, $query);
     if (mysqli_num_rows($result) > 0) {
         // Если запись уже существует, то получаем ее ID
@@ -30,40 +30,42 @@
         $client_id = mysqli_insert_id($conn);
     }
 
-        $client_id = mysqli_insert_id($conn);
+    $client_id = mysqli_insert_id($conn);
 
-        $photo1 = $photo2 = $photo3 = '';
-        if (!empty($_FILES['photo'])) {
-            $files = $_FILES['photo'];
-            $photo_paths = array();
-            foreach ($files['name'] as $key => $value) {
-                $tmp_name = $files['tmp_name'][$key];
-                $name = $files['name'][$key];
-                $upload_dir = 'uploads/';
-                $upload_file = $upload_dir . $name;
-                move_uploaded_file($tmp_name, $upload_file);
-                $photo_paths[] = $upload_file;
-            }
-            $photo1 = $photo_paths[0];
-            $photo2 = $photo_paths[1];
-            $photo3 = $photo_paths[2];
+    $photo1 = $photo2 = $photo3 = '';
+    if (!empty($_FILES['photo'])) {
+        $files = $_FILES['photo'];
+        $photo_paths = array();
+        foreach ($files['name'] as $key => $value) {
+            $tmp_name = $files['tmp_name'][$key];
+            $name = $files['name'][$key];
+            $upload_dir = 'uploads/';
+            $upload_file = $upload_dir . $name;
+            move_uploaded_file($tmp_name, $upload_file);
+            $photo_paths[] = $upload_file;
         }
-
-$query = "INSERT INTO orders (Discrip, Sender, Specialist, Date_by, Status, Photo1, Photo2, Photo3) VALUES ('$discrip', '$fio', 'Не назначенно', NOW(), 'Новая', '$photo1', '$photo2', '$photo3')";        
-        mysqli_query($conn, $query);
-
-        mysqli_close($conn);
-
-        // Перенаправление на страницу благодарности
-        // header('Location: Login.php');
-        exit;
+        $photo1 = $photo_paths[0];
+        $photo2 = $photo_paths[1];
+        $photo3 = $photo_paths[2];
     }
-    ?>
+
+    $query = "INSERT INTO orders (Discrip, Sender, Specialist, Date_by, Status, Photo1, Photo2, Photo3) VALUES ('$discrip', '$fio', 'Не назначенно', NOW(), 'Новая', '$photo1', '$photo2', '$photo3')";
+    mysqli_query($conn, $query);
+
+    mysqli_close($conn);
+
+    // Перенаправление на страницу благодарности
+    sleep(5);
+    header('Location: oneschool-master/index.html');
+    exit;
+}
+?>
 
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
+    <link type="image/png" sizes="16x16" rel="icon" href="/icons8-модуль-16.png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
@@ -140,9 +142,38 @@ $query = "INSERT INTO orders (Discrip, Sender, Specialist, Date_by, Status, Phot
                         <button type="submit" name="submit">Отправить заявку</button>
                     </div>
                 </form>
+                <div id="myModal" class="modal">
+                    <div class="modal-content">
+                        <span class="close">&times;</span>
+                        <p>Заявка создана, чтобы отслеживать ход зявки, вы можете воспользоваться телеграмм-ботом.</p>
+
+                    </div>
+                </div>
             </div>
         </div>
     </div>
+    <script>
+        document.querySelector('form').addEventListener('submit', function () {
+            document.getElementById('myModal').style.display = 'block';
+            setTimeout(function () {
+                document.getElementById('myModal').style.display = 'none';
+                window.location.href = '/oneschool-master/index.html';
+            }, 15000);
+        });
+
+        document.querySelector('.close').addEventListener('click', function () {
+            document.getElementById('myModal').style.display = 'none';
+        });
+
+        window.addEventListener('click', function (event) {
+            if (event.target == document.getElementById('myModal')) {
+                document.getElementById('myModal').style.display = 'none';
+            }
+        });
+    </script>
+    <?php
+    
+    ?>
 </body>
 
 </html>

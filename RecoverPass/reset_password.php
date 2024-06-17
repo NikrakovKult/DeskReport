@@ -104,7 +104,7 @@ if (!isset($_POST['token'])) {
 
             if ($stmt->execute()) {
                 $success = "Пароль успешно сброшен.";
-                header("Location: /login.php");
+                header("Location: ../../login.php");
             } else {
                 $error = "Ошибка при смене пароля.";
             }

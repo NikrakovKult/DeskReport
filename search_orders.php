@@ -88,6 +88,14 @@ if (isset($_POST['searchQuery']) && isset($_POST['status'])) {
 } else {
     echo "";
 }
+
+
+
+
+
+
+
+
 function getStatusClass($status)
         {
             switch ($status) {
@@ -103,5 +111,6 @@ function getStatusClass($status)
                     return '';
             }
         }
+        
         
 ?>

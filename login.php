@@ -158,6 +158,7 @@ $conn->close();
 <html lang="en">
 
 <head>
+<link type="image/png" sizes="16x16" rel="icon" href="/icons8-модуль-16.png">
     <title>DeskReport</title>
     <script src="LoginFunc.js"></script>
     <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>

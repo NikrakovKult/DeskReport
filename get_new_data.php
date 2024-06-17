@@ -58,7 +58,7 @@ $completedDataYear = array_fill(0, 12, 0);
 $query = "SELECT MONTH(Date_by) as month, COUNT(*) as count FROM orders WHERE Date_by BETWEEN '$firstDayOfYear' AND '$lastDayOfYear' GROUP BY month";
 $result = mysqli_query($conn, $query);
 while ($row = mysqli_fetch_assoc($result)) {
-    $month = $row['month'];
+    $month = $row['month'] + 1;
     $dataYear[$month - 1] += $row['count'];
 }
 

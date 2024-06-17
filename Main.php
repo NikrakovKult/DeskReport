@@ -65,6 +65,7 @@ if (isset($_SESSION["id"])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DeskReport</title>
+    <link type="image/png" sizes="16x16" rel="icon" href="/icons8-модуль-16.png">
     <link rel="stylesheet" href="/Styles/Main.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="MainFunc.js"></script>
@@ -148,9 +149,6 @@ if (isset($_SESSION["id"])) {
             <a href="#" class="nav-item" active-color="blue" onclick="showZametki()">
                 <i class='fa fa-sticky-note'></i> Заметки
             </a>
-            <a href="#" class="nav-item" active-color="blue">
-                <i class='fa fa-check-square'></i> Задачи
-            </a>
             <a href="#" class="nav-item" active-color="blue" onclick="showGraph()">
                 <i class="fa fa-chart-line"></i> Анализ
             </a>
@@ -168,7 +166,16 @@ if (isset($_SESSION["id"])) {
         </select>
         <select name="specialist" id="specialist" onchange="updateTable(this.value)">
             <option value="">Все специалисты</option>
-            <option value="<?php echo $user_data['username']; ?>">Мои заявки</option>
+            <?php
+            // Query to get all the specialists
+            $query = "SELECT * FROM users";
+            $result = mysqli_query($conn, $query);
+
+            // Loop through the specialists and add them to the dropdown list
+            while ($row = mysqli_fetch_assoc($result)) {
+                echo '<option value="' . $row['username'] . '">' . $row['username'] . '</option>';
+            }
+            ?>
         </select>
         <button id="update-button">Обновить таблицу</button>
         <select id="update-interval">
@@ -177,7 +184,7 @@ if (isset($_SESSION["id"])) {
             <option value="20">Каждые 20 секунд</option>
             <option value="60">Каждую 1 минуту</option>
         </select>
-        <button id="add-button" "><a href=" NewOrder.php">Добавить</a></button>
+
     </div>
     <div class="user-info">
         <p> <?php echo $user_data['username']; ?></p>
@@ -341,32 +348,22 @@ if (isset($_SESSION["id"])) {
             $stmt->execute();
             $result = $stmt->get_result();
 
-            // Создание таблицы
-            echo "<table border='0' id='users-table'>";
-            echo "<thead>
-            <tr id='head'>
-                <th>ID</th>
-                <th>Имя пользователя</th>
-                <th>Email</th>
-                <th>Должность</th>
-                <th>Отдел</th>
-                <th>Мобильный телефон</th>
-            </tr>
-          </thead>";
+            // Создание блока users-block
+            echo "<div id='users-block'>";
 
-            // Вывод данных из таблицы
+            // Вывод данных в виде карточек
             while ($row = mysqli_fetch_assoc($result)) {
-                echo "<tr>";
-                echo "<td><a href='user_details.php?id=" . $row['id'] . "'>" . $row['id'] . "</a></td>";
-                echo "<td><a href='user_details.php?id=" . $row['id'] . "'>" . $row['username'] . "</a></td>";
-                echo "<td><a href='user_details.php?id=" . $row['id'] . "'>" . $row['email'] . "</a></td>";
-                echo "<td><a href='user_details.php?id=" . $row['id'] . "'>" . $row['Doljnost'] . "</a></td>";
-                echo "<td><a href='user_details.php?id=" . $row['id'] . "'>" . $row['Otdel'] . "</a></td>";
-                echo "<td><a href='user_details.php?id=" . $row['id'] . "'>" . $row['Mobile'] . "</a></td>";
-                echo "</tr>";
+                echo "<div class='card'>";
+                echo "<h2><a href='user_details.php?id=" . $row['id'] . "'>" . $row['username'] . "</a></h2>";
+                echo "<p>ID: <a href='user_details.php?id=" . $row['id'] . "'>" . $row['id'] . "</a></p>";
+                echo "<p>Email: <a href='user_details.php?id=" . $row['id'] . "'>" . $row['email'] . "</a></p>";
+                echo "<p>Должность: <a href='user_details.php?id=" . $row['id'] . "'>" . $row['Doljnost'] . "</a></p>";
+                echo "<p>Отдел: <a href='user_details.php?id=" . $row['id'] . "'>" . $row['Otdel'] . "</a></p>";
+                echo "<p>Мобильный телефон: <a href='user_details.php?id=" . $row['id'] . "'>" . $row['Mobile'] . "</a></p>";
+                echo "</div>";
             }
 
-            echo "</table>";
+            echo "</div>";
         }
         ?>
 
@@ -476,7 +473,7 @@ if (isset($_SESSION["id"])) {
             $query = "SELECT DATE_FORMAT(Date_by, '%d') as day, COUNT(*) as count FROM orders WHERE Date_by BETWEEN '$firstDayOfMonth' AND '$lastDayOfMonth' GROUP BY day";
             $result = mysqli_query($conn, $query);
             while ($row = mysqli_fetch_assoc($result)) {
-                $day = $row['day'];
+                $day = $row['day'] + 1;
                 $newDataMonth[$day - 1] += $row['count']; // суммируем количество заявок для каждого дня месяца
             }
 

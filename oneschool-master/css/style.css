@@ -635,7 +635,7 @@ h1, h2, h3, h4, h5,
     color: #fff;
     margin-bottom: 1.5rem; }
   .intro-section p {
-    color: rgba(255, 255, 255, 0.5);
+    color: rgba(255, 255, 255, 0.89);
     font-size: 1.1rem; }
 
 .img-absolute {
@@ -661,7 +661,7 @@ h1, h2, h3, h4, h5,
     position: absolute;
     height: 100%;
     width: 100%;
-    background: #343a40;
+    background: #343a4075;
     opacity: .9;
     border-bottom-right-radius: 0px; }
     @media (max-width: 991.98px) {

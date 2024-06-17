@@ -1,78 +1,78 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <style>
-     #notes-block {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr); /* 3 columns */
-  grid-gap: 10px;
-}
-
-.note {
-  background-color: #f0f0f0;
-  padding: 10px;
-  border: 1px solid #ccc;
-  margin-bottom: 10px;
-}
-      #modal-create-note {
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        background-color: #fff;
-        padding: 20px;
-        border: 1px solid #ccc;
-        display: none;
-      }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
 </head>
 <body>
-<button id="create-note-btn">Создать заметку</button>
+  <script>
+    import React, { useState } from 'eact';
+import axios from 'axios';
 
-<!-- Модальное окно для создания заметки -->
-<div id="modal-create-note">
-  <form id="create-note-form">
-    <label for="title">Заголовок:</label>
-    <input type="text" id="title" name="title"><br><br>
-    <label for="text">Текст:</label>
-    <textarea id="text" name="text"></textarea><br><br>
-    <button id="save-note-btn">Сохранить</button>
-  </form>
-</div>
+function TaskCreator() {
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
+  const [assignedTo, setAssignedTo] = useState('');
+  const [users, setUsers] = useState([]);
+  const [showModal, setShowModal] = useState(false);
 
-<!-- Блок для отображения заметок -->
-<div id="notes-block"></div>
-
-<script>
-     fetch('load_notes.php')
-   .then(response => response.json())
-   .then(data => {
-        var notesHtml = '';
-        data.notes.forEach(function(note) {
-            notesHtml += note;
-        });
-        document.getElementById('notes-block').innerHTML = notesHtml;
-    });
-    document.getElementById('create-note-btn').addEventListener('click', function() {
-      document.getElementById('modal-create-note').style.display = 'block';
-    });
-
-    document.getElementById('save-note-btn').addEventListener('click', function(event) {
-      event.preventDefault(); // добавляем это
-      var formData = new FormData(document.getElementById('create-note-form'));
-      fetch('create_note.php', {
-        method: 'POST',
-        body: formData
-      })
-    .then(response => response.json())
-    .then(data => {
-        document.getElementById('modal-create-note').style.display = 'none';
-        document.getElementById('notes-block').innerHTML += data.note;
+  const handleCreateTask = async () => {
+    try {
+      const response = await axios.post('/tasks', {
+        title,
+        description,
+        assignedTo,
       });
-    });
-</script>
+      console.log(response);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleGetUsers = async () => {
+    try {
+      const response = await axios.get('/users');
+      setUsers(response.data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  return (
+    <div>
+      <button onClick={() => setShowModal(true)}>Создать задачу</button>
+      {showModal && (
+        <div className="modal">
+          <h2>Создать задачу</h2>
+          <form>
+            <label>
+              Название задачи:
+              <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} />
+            </label>
+            <label>
+              Описание задачи:
+              <textarea value={description} onChange={(e) => setDescription(e.target.value)} />
+            </label>
+            <label>
+              Назначить задачу:
+              <select value={assignedTo} onChange={(e) => setAssignedTo(e.target.value)}>
+                {users.map((user) => (
+                  <option key={user.id} value={user.id}>
+                    {user.username}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <button onClick={handleCreateTask}>Создать задачу</button>
+          </form>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default TaskCreator;
+  </script>
 </body>
 </html>

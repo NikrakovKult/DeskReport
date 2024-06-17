@@ -17,8 +17,14 @@ grid-template-columns: 25% 1fr 25%;
 grid-template-rows: 20% 10% 1fr;
 grid-column-gap: 0px;
 grid-row-gap: 0px;
+font-family: system-ui;
+
 }
 
+
+.user-card:hover .hidden-info {
+  display: block;
+}
 .nav-sidebar {
   display: flex;
     justify-content: center;
@@ -491,4 +497,83 @@ th {
     background:#00000088;
     transition: 0.2s;
 }
-
+#users-block {
+  display: none;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.card a{
+  text-decoration: none;
+  color: white;
+}
+.card {
+  text-align: start;
+    color: white;
+    background: #00000075;
+    width: 300px;
+    margin: 20px;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.);
+}
+.card:hover {
+  transform: scale(1.05); /* увеличиваем масштаб при наведении */
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.3); /* добавляем тень при наведении */
+}
+#search-input{
+  color: white;
+    background: #00000085;
+    border-radius: 15px;
+    border: none;
+    margin: 2px;
+}
+#status{
+  color: white;
+  background: #00000085;
+  border-radius: 15px;
+  border: none;
+  margin: 2px;
+}
+#specialist{
+  color: white;
+  background: #00000085;
+  border-radius: 15px;
+  border: none;
+  margin: 2px;
+}
+#update-button{
+  color: white;
+  background: #00000085;
+  border-radius: 15px;
+  border: none;
+  margin: 2px;
+  transition: 0.5s;
+}
+#update-button:hover{
+  color: rgb(0, 0, 0);
+  background: #ccccccd7;
+  transition: 0.5s;
+}
+#update-interval{
+  color: white;
+  background: #00000085;
+  border-radius: 15px;
+  border: none;
+  margin: 2px;
+}
+#new-order-modal {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 500px;
+  height: 600px;
+  box-sizing: border-box;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #fff;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+}
