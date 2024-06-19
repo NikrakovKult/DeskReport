@@ -177,3 +177,23 @@ function updateTable(specialist) {
         }
     });
 }
+document.addEventListener('click', function(event) {
+    if (event.target.classList.contains('delete-user-btn')) {
+        var userId = event.target.getAttribute('data-user-id');
+        fetch('delete_user.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: 'id=' + userId
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    event.target.parentNode.remove();
+                } else {
+                    alert('Ошибка удаления пользователя');
+                }
+            });
+    }
+});

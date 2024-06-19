@@ -54,7 +54,19 @@ if (isset($_SESSION["id"])) {
     echo "Вы не авторизованы";
     exit;
 }
+if (isset($_POST['id'])) {
+    $id = $_POST['id'];
+    $query = "DELETE FROM users WHERE id =?";
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param("i", $id);
+    $stmt->execute();
 
+    if ($stmt->affected_rows > 0) {
+        echo json_encode(array('success' => true));
+    } else {
+        echo json_encode(array('success' => false));
+    }
+}
 
 ?>
 
@@ -185,6 +197,8 @@ if (isset($_SESSION["id"])) {
             <option value="60">Каждую 1 минуту</option>
         </select>
 
+       
+        
     </div>
     <div class="user-info">
         <p> <?php echo $user_data['username']; ?></p>
@@ -341,32 +355,36 @@ if (isset($_SESSION["id"])) {
         }
         ?>
 
-        <?php
-        if (isset($_SESSION['id'])) {
-            $sql = "SELECT * FROM users";
-            $stmt = $conn->prepare($sql);
-            $stmt->execute();
-            $result = $stmt->get_result();
+<?php
+if (isset($_SESSION['id'])) {
+    $sql = "SELECT * FROM users";
+    $stmt = $conn->prepare($sql);
+    $stmt->execute();
+    $result = $stmt->get_result();
 
-            // Создание блока users-block
-            echo "<div id='users-block'>";
+    // Создание блока users-block
+    echo "<div id='users-block'>";
 
-            // Вывод данных в виде карточек
-            while ($row = mysqli_fetch_assoc($result)) {
-                echo "<div class='card'>";
-                echo "<h2><a href='user_details.php?id=" . $row['id'] . "'>" . $row['username'] . "</a></h2>";
-                echo "<p>ID: <a href='user_details.php?id=" . $row['id'] . "'>" . $row['id'] . "</a></p>";
-                echo "<p>Email: <a href='user_details.php?id=" . $row['id'] . "'>" . $row['email'] . "</a></p>";
-                echo "<p>Должность: <a href='user_details.php?id=" . $row['id'] . "'>" . $row['Doljnost'] . "</a></p>";
-                echo "<p>Отдел: <a href='user_details.php?id=" . $row['id'] . "'>" . $row['Otdel'] . "</a></p>";
-                echo "<p>Мобильный телефон: <a href='user_details.php?id=" . $row['id'] . "'>" . $row['Mobile'] . "</a></p>";
-                echo "</div>";
-            }
+    // Вывод данных в виде карточек
+    while ($row = mysqli_fetch_assoc($result)) {
+        echo "<div class='card'>";
+        echo "<h2><a href='user_details.php?id=" . $row['id'] . "'>" . $row['username'] . "</a></h2>";
+        echo "<p>ID: <a href='user_details.php?id=" . $row['id'] . "'>" . $row['id'] . "</a></p>";
+        echo "<p>Email: <a href='user_details.php?id=" . $row['id'] . "'>" . $row['email'] . "</a></p>";
+        echo "<p>Должность: <a href='user_details.php?id=" . $row['id'] . "'>" . $row['Doljnost'] . "</a></p>";
+        echo "<p>Отдел: <a href='user_details.php?id=" . $row['id'] . "'>" . $row['Otdel'] . "</a></p>";
+        echo "<p>Мобильный телефон: <a href='user_details.php?id=" . $row['id'] . "'>" . $row['Mobile'] . "</a></p>";
+        echo "<button class='delete-user-btn' data-user-id='" . $row['id'] . "'>Удалить</button>";
+        echo "</div>";
+    }
 
-            echo "</div>";
-        }
-        ?>
+    echo "</div>";
+}
+?>
+<script>
+    
 
+</script>
         <div class="graph">
             <div style="width: 20%; color:white; margin:10px;">
                 <h2>Новые заявки</h2>
